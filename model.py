@@ -31,5 +31,3 @@ class ModelBasic():
 
     def update_item(self, name, price, quantity):
         basic_backend.update_item(name, price, quantity)
-
-

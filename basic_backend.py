@@ -1,5 +1,10 @@
-"""Contains ItemAlreadyStored and ItemNotStored exceptions"""
+"""Contains ItemAlreadyStored and ItemNotStored exceptions
+Controller class and View class
+"""
 import mvc_exceptions as mvc_exc
+import model as data
+import view as presentation
+import controller as logic
 
 items = list() # global variable where we keep the data
 
@@ -53,31 +58,26 @@ def main():
         {'name': 'wine', 'price': 10.0, 'quantity': 5},
     ]
 
-    # CREATE
-    create_items(my_items)
-    create_item('beer', price=3.0, quantity=15)
-    # if we try to re-create an object we get an ItemAlreadyStored exception
-    # create_item('beer', price=2.0, quantity=10)
+    ctrlr = logic.Controller(data.ModelBasic(my_items), presentation.View())
 
-    # READ
-    print('READ items')
-    print(read_items())
-    # if we try to read an object not stored we get an ItemNotStored exception
-    # print('READ chocolate')
-    # print(read_item('chocolate'))
-    print('READ bread')
-    print(read_item('bread'))
-
-    # UPDATE
-    print('UPDATE bread')
-    update_item('bread', price=2.0, quantity=30)
-    print(read_item('bread'))
-    # if we try to update an object not stored we get an ItemNotStored exception
-    # print('UPDATE chocolate')
-    # update_item('chocolate', price=10.0, quantity=20)
-
-    print('READ items')
-    print(read_items())
+    print('show items without bullet points')
+    ctrlr.show_items()
+    print('show items with bullet points')
+    ctrlr.show_items(bullet_points=True)
+    print('show item not in list')
+    ctrlr.show_item('chocolate')
+    print('show item in list')
+    ctrlr.show_item('bread')
+    print('trying to insert duplicate item')
+    ctrlr.insert_item('bread', price=1.0, quantity=5)
+    print('inserting a valid item')
+    ctrlr.insert_item('chocolate', price=2.0, quantity=10)
+    print('showing the last item inserted')
+    ctrlr.show_item('chocolate')
+    print('updating an item')
+    ctrlr.update_item('milk', price=1.2, quantity=20)
+    print('trying to update an item that\'s not in the list')
+    ctrlr.update_item('ice cream', price=3.5, quantity=20)
 
 if __name__ == '__main__':
     main()
