@@ -1,0 +1,152 @@
+"""needs tinydb imports"""
+from tinydb import TinyDB #pylint: disable=E0401
+from tinydb import Query #pylint: disable=E0401
+import mvc_exceptions as mvc_exc
+
+DB_NAME = 'myDB'
+
+def connect_to_db(name=DB_NAME):
+    """Connect to a tinyDB. Create the database if there isn't one yet.
+    Open a connection to a tinyDB
+    When a database is accessed by multiple connections, and one of the
+    processes modifies the database, the tinyDB is locked until that
+    transaction is committed.
+
+    Parameters
+    ----------
+    name : str
+        database name (without .json extension).
+
+    Returns
+    -------
+    mydb:
+        db object
+    """
+    mydb = TinyDB('{}.json'.format(name))
+    TinyDB.DEFAULT_TABLE = 'my-default'
+    TinyDB.DEFAULT_TABLE_KWARGS = {'cache_size': 0}
+    print('New connections to tinyDB...')
+    return mydb
+
+def connect(func):
+    """Tries a very fast query to make sure the db is here.
+    else it creates it.
+    """
+    def inner_func(mydb, *args, **kwargs):
+        try:
+            res = mydb.search(Query().type == 'table')
+        except not res:
+            mydb = connect_to_db()
+        return func(mydb, *args, **kwargs)
+    return inner_func
+
+def disconnect_from_db(mydb=None):
+    """disconnects from DB"""
+    if mydb is not None:
+        mydb.close()
+
+def scrub(input_string):
+    """Clean an input string
+
+    Parameters
+    ----------
+    input_string : str
+
+    Returns
+    -------
+    str
+    """
+    return ''.join(k for k in input_string if k.isalnum())
+
+@connect
+def create_table(mydb, table_name):
+    """creates a table"""
+    table_name = scrub(table_name)
+    mydb.table(table_name)
+
+@connect
+def insert_one(mydb, name, price, quantity, table_name):
+    """inserts one item"""
+    table_name = scrub(table_name)
+    table = mydb.table(table_name)
+    table.insert({'name': name, 'price': price, 'quantity': quantity})
+
+@connect
+def insert_many(mydb, items, table_name):
+    """inserts multiple items"""
+    table_name = scrub(table_name)
+    table = mydb.table(table_name)
+    table.insert_multiple(
+        {'name': item['name'],
+         'price': item['price'],
+         'quantity': item['quantity']}
+        for item in items)
+
+def tuple_to_dict(mytuple):
+    """converts tuple to dict"""
+    mydict = dict()
+    mydict['id'] = mytuple[0]
+    mydict['name'] = mytuple[1]
+    mydict['price'] = mytuple[2]
+    mydict['quantity'] = mytuple[3]
+    return mydict
+
+@connect
+def select_one(mydb, item_name, table_name):
+    """read one item"""
+    table_name = scrub(table_name)
+    item_name = scrub(item_name)
+    table = mydb.table(table_name)
+    item = table.search(where('name') == item_name) #pylint: disable=E0602
+    if item is not None:
+        return tuple_to_dict(item)
+    raise mvc_exc.ItemNotStored(
+        'Can\'t read "{}" because it\'s not stored in table "{}"'
+        .format(item_name, table_name))
+
+@connect
+def select_all(mydb, table_name):
+    """read whole table"""
+    table_name = scrub(table_name)
+    table = mydb.table(table_name)
+    results = table.all()
+    return list(map(tuple_to_dict, results))
+
+@connect
+def update_one(mydb, name, price, quantity, table_name):
+    """update one item"""
+    table_name = scrub(table_name)
+    table = mydb.table(table_name)
+    if not table.update({'name': name, 'price': price,
+                         'quantity': quantity},
+                        Query().name == name):
+        raise mvc_exc.ItemNotStored(
+            'Can\'t update "{}" because it\'s not stored \
+            in the table "{}"'.format(name, table_name))
+
+def main():
+    """main function"""
+    table_name = 'items'
+    mydb = connect_to_db()
+    create_table(mydb, table_name)
+    my_items = [
+        {'name': 'bread', 'price': 0.5, 'quantity': 20},
+        {'name': 'milk', 'price': 1.0, 'quantity': 10},
+        {'name': 'wine', 'price': 10.0, 'quantity': 5}
+    ]
+
+    # CREATE
+    insert_many(mydb, my_items, table_name)
+    insert_one(mydb, 'beer', price=2.0, quantity=5, table_name='items')
+    # test item already stored exception
+    insert_one(mydb, 'milk', price=1.0, quantity=3, table_name='items')
+
+    # READ
+
+    # UPDATE
+
+    # close connection
+    disconnect_from_db(mydb)
+
+if __name__ == '__main__':
+    main()
