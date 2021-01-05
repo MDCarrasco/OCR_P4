@@ -1,12 +1,18 @@
 """The model file needs exceptions and backend logic"""
-import basic_backend
-import mvc_exceptions as mvc_exc
+import tinydb_backend
 
-class ModelBasic():
+class ModelTinydb():
     """basic model class"""
     def __init__(self, application_items):
         self._item_type = 'product'
+        self._connection = tinydb_backend.connect_to_db(tinydb_backend.DB_NAME)
+        tinydb_backend.create_table(self.connection, self._item_type)
         self.create_items(application_items)
+
+    @property
+    def connection(self):
+        """get connection (mydb)"""
+        return self._connection
 
     @property
     def item_type(self):
@@ -18,16 +24,26 @@ class ModelBasic():
         self._item_type = new_item_type
 
     def create_item(self, name, price, quantity):
-        basic_backend.create_item(name, price, quantity)
+        """inserts an item into db"""
+        tinydb_backend.insert_one(self.connection, name, price, quantity,
+                                  table_name=self.item_type)
 
     def create_items(self, items):
-        basic_backend.create_items(items)
+        """inserts many items into db"""
+        tinydb_backend.insert_many(self.connection, items,
+                                   table_name=self.item_type)
 
     def read_item(self, name):
-        return basic_backend.read_item(name)
+        """selects an item from db"""
+        return tinydb_backend.select_one(self.connection, name,
+                                         table_name=self.item_type)
 
     def read_items(self):
-        return basic_backend.read_items()
+        """selects a table from db"""
+        return tinydb_backend.select_all(self.connection,
+                                         table_name=self.item_type)
 
     def update_item(self, name, price, quantity):
-        basic_backend.update_item(name, price, quantity)
+        """updates an item into db"""
+        tinydb_backend.update_one(self.connection, name, price, quantity,
+                                  table_name=self.item_type)
