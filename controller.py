@@ -20,7 +20,7 @@ class Controller():
     def show_item(self, item_name):
         """shows item"""
         try:
-            item = self.model. read_item(item_name)
+            item = self.model.read_item(item_name)
             item_type = self.model.item_type
             self.view.show_item(item_type, item_name, item)
         except mvc_exc.ItemNotStored as exc:

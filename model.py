@@ -1,4 +1,4 @@
-"""The model file needs exceptions and backend logic"""
+"""The model file needs backend logic"""
 import tinydb_backend
 
 class ModelTinydb():

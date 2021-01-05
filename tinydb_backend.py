@@ -35,8 +35,8 @@ def connect(func):
     """
     def inner_func(mydb, *args, **kwargs):
         try:
-            res = mydb.search(Query().type == 'table')
-        except not res:
+            mydb.tables()
+        except ValueError:
             mydb = connect_to_db()
         return func(mydb, *args, **kwargs)
     return inner_func
@@ -45,6 +45,7 @@ def disconnect_from_db(mydb=None):
     """disconnects from DB"""
     if mydb is not None:
         mydb.close()
+        print('Disconnecting from tinyDB...')
 
 def scrub(input_string):
     """Clean an input string
@@ -99,7 +100,7 @@ def select_one(mydb, item_name, table_name):
     table = mydb.table(table_name)
     item = table.search(where('name') == item_name)
     if item:
-        return item
+        return item[0]
     raise mvc_exc.ItemNotStored(
         'Can\'t read "{}" because it\'s not stored in table "{}"'
         .format(item_name, table_name))
@@ -109,7 +110,7 @@ def select_all(mydb, table_name):
     """read whole table"""
     table_name = scrub(table_name)
     table = mydb.table(table_name)
-    return list(table)
+    return table.all()
 
 @connect
 def update_one(mydb, name, price, quantity, table_name):
@@ -122,7 +123,7 @@ def update_one(mydb, name, price, quantity, table_name):
         raise mvc_exc.ItemNotStored(
             'Can\'t update "{}" because it\'s not stored '
             'in the table "{}"'.format(name, table_name))
-
+'''
 def main():
     """main function"""
     table_name = 'items'
@@ -163,3 +164,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+'''
