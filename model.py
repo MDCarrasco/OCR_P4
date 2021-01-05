@@ -2,7 +2,7 @@
 import tinydb_backend
 
 class ModelTinydb():
-    """basic model class"""
+    """tinydb model class"""
     def __init__(self, application_items):
         self._item_type = 'product'
         self._connection = tinydb_backend.connect_to_db(tinydb_backend.DB_NAME)
@@ -47,3 +47,86 @@ class ModelTinydb():
         """updates an item into db"""
         tinydb_backend.update_one(self.connection, name, price, quantity,
                                   table_name=self.item_type)
+
+class Tournament:
+    """tournament model class
+    Tournament :
+        - Name
+        - Place
+        - Date
+        - Round_count
+        - Rounds
+        - Players
+        - Time_control (bullet, blitz, rapid)
+        - Description
+    """
+    def __init__(self):
+        pass
+    def method1(self, arg1=None):
+        """method1"""
+    def method2(self, arg1=None):
+        """method2"""
+
+class Player:
+    """player model class
+    Player :
+        - Last_name
+        - First_name
+        - Birth_date
+        - Sex
+        - Ranking
+    """
+    def __init__(self):
+        pass
+    def method1(self, arg1=None):
+        """method1"""
+    def method2(self, arg1=None):
+        """method2"""
+
+class Round:
+    """round model class
+    Round :
+        - Name
+        - Start_date_time (constructed)
+        - End_date_time (set when user creates a round and sets it as finished)
+        - List of matches
+    """
+    def __init__(self):
+        pass
+    def method1(self, arg1=None):
+        """method1"""
+    def method2(self, arg1=None):
+        """method2"""
+
+class Match:
+    """match model class
+    Match :
+        - list of tuples (tuple = (player, player))
+        - list of tuples (tuple = (score, score))
+    """
+    def __init__(self):
+        pass
+    def method1(self, arg1=None):
+        """method1"""
+    def method2(self, arg1=None):
+        """method2"""
+
+class Log:
+    """log model class
+    Log:
+        - list of all actors :
+            . alphabetical order ;
+            . ranking order.
+        - list of all players in a tournament :
+            . alphabetical order ;
+            . ranking order.
+        - list of all tournaments.
+        - list of all rounds in a tournament.
+        - list of all matches in a tournament.
+    """
+    def __init__(self):
+        pass
+    def method1(self, arg1=None):
+        """method1"""
+    def method2(self, arg1=None):
+        """method2"""
