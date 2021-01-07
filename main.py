@@ -1,18 +1,27 @@
 """needs MVC imports"""
 from controller import Controller
-from model import ModelTinydb
+from model import TournamentCarrier
+from model import PlayerCarrier
 from view import View
 import tinydb_backend
 
 if __name__ == '__main__':
 
-    my_items = [
-        {'name': 'bread', 'price': 0.5, 'quantity': 20},
-        {'name': 'milk', 'price': 1.0, 'quantity': 10},
-        {'name': 'wine', 'price': 10.0, 'quantity': 5},
+    # TODO 08/01/21
+    # Create instances of tournament and player
+    # test all functions with this main
+    # check for bugs (there will be for sure)
+
+    my_tournament = [
+        some tournament here
     ]
 
-    c = Controller(ModelTinydb(my_items), View())
+    my_players = [
+        some players here
+    ]
+
+    c = Controller(TournamentCarrier(my_tournament),
+                   PlayerCarrier(my_players) View())
     c.show_items()
     c.show_items(bullet_points=True)
     c.show_item('chocolate')
@@ -28,8 +37,14 @@ if __name__ == '__main__':
     c.show_items()
 
     # we close the current sqlite database connection explicitly
-    if isinstance(c.model, ModelTinydb):
-        tinydb_backend.disconnect_from_db(c.model.connection)
+    if isinstance(c.models[0], TournamentCarrier):
+        tinydb_backend.disconnect_from_db(c.model[0].connection)
         # the sqlite backend understands that it needs to open a new connection
         c.show_items()
-        tinydb_backend.disconnect_from_db(c.model.connection)
+        tinydb_backend.disconnect_from_db(c.model[0].connection)
+    # we close the current sqlite database connection explicitly
+    if isinstance(c.models[1], PlayerCarrier):
+        tinydb_backend.disconnect_from_db(c.model[1].connection)
+        # the sqlite backend understands that it needs to open a new connection
+        c.show_items()
+        tinydb_backend.disconnect_from_db(c.model[1].connection)

@@ -83,7 +83,7 @@ def insert_one(mydb, item, table_name):
     if table_name == 'player':
         table.insert(
             {'first_name': item.first_name, 'last_name': item.last_name,
-             'birth_date': item.birth_date, 'sex': item.sex,
+             'birth_date': item.birth_date, 'gender': item.gender,
              'ranking': item.ranking})
     else:
         table.insert(
@@ -108,7 +108,7 @@ def insert_many(mydb, items, table_name):
         if table_name == 'player':
             table.insert(
                 {'fist_name': item.first_name, 'last_name': item.last_name,
-                 'birth_date': item.birth_date, 'sex': item.sex,
+                 'birth_date': item.birth_date, 'gender': item.gender,
                  'ranking': item.ranking})
         else:
             table.insert(
@@ -149,7 +149,7 @@ def update_one(mydb, item, table_name):
     if table_name == 'player':
         if not table.update(
                 {'fist_name': item.first_name, 'last_name': item.last_name,
-                 'birth_date': item.birth_date, 'sex': item.sex,
+                 'birth_date': item.birth_date, 'gender': item.gender,
                  'ranking': item.ranking}, Query().name == item.fist_name +
                 ' ' + item.last_name):
             raise mvc_exc.ItemNotStored(
@@ -166,6 +166,7 @@ def update_one(mydb, item, table_name):
                 'Can\'t update "{}" because it\'s not stored '
                 'in the table "{}"'.format(item.name, table_name))
 
+# pylint: disable=pointless-string-statement
 '''
 def main():
     """main function"""

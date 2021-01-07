@@ -1,5 +1,6 @@
 """The model file needs abstract and backend logic"""
 from abc import ABC
+from enum import Enum
 import tinydb_backend
 
 class ModelTinydbCarrier(ABC):
@@ -58,13 +59,10 @@ class TournamentCarrier(ModelTinydbCarrier):
     """
 
     def __init__(self, tournament_items):
-        self.__item_type = 'tournament'
+        self._item_type = 'tournament'
         super().__init__(tournament_items)
 
-    def method1(self, arg1=None):
-        """method1"""
-    def method2(self, arg1=None):
-        """method2"""
+
 
 class PlayerCarrier(ModelTinydbCarrier):
     """Player Carrier class
@@ -73,7 +71,7 @@ class PlayerCarrier(ModelTinydbCarrier):
     """
 
     def __init__(self, player_items):
-        self.__item_type = 'player'
+        self._item_type = 'player'
         super().__init__(player_items)
 
     def method1(self, arg1=None):
@@ -96,22 +94,18 @@ class Tournament:
 
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
-    def __init__(self, name, place, date, round_count, rounds, players,
-                 time_control, description):
-        self.__name = name
-        self.__place = place
-        self.__date = date
-        self.__round_count = round_count
-        self.__rounds = rounds
-        self.__players = players
-        self.__time_control = time_control
-        self.__description = description
+    # pylint: disable=too-few-public-methods
 
-    def method1(self, arg1=None):
-        """method1"""
-    def method2(self, arg1=None):
-        """method2"""
-
+    def __init__(self, name, place, date, rounds, players, time_control,
+                 description, round_count=4):
+        self.name = name
+        self.place = place
+        self.date = date
+        self.round_count = round_count
+        self.rounds = rounds
+        self.players = players
+        self.time_control = time_control
+        self.description = description
 
 class Player:
     """player model class
@@ -119,25 +113,43 @@ class Player:
         - Last_name
         - First_name
         - Birth_date
-        - Sex
+        - Gender
         - Ranking
     """
 
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-few-public-methods
 
-    def __init__(self, first_name, last_name, birth_date, sex, ranking):
-        self.__item_type = 'player'
-        self.__first_name = first_name
-        self.__last_name = last_name
-        self.__birth_date = birth_date
-        self.__sex = sex
-        self.__ranking = ranking
+    def __init__(self, first_name, last_name, birth_date, gender, ranking):
+        self.item_type = 'player'
+        self.first_name = first_name
+        self.last_name = last_name
+        self.birth_date = birth_date
+        self.gender = gender
+        self.ranking = ranking
 
-    def method1(self, arg1=None):
-        """method1"""
-    def method2(self, arg1=None):
-        """method2"""
+class TimeControl(Enum):
+    """time_control enum"""
+    BULLET = 'bullet'
+    BLITZ = 'blitz'
+    RAPID = 'rapid'
+
+    @classmethod
+    def has_value(cls, value):
+        """checks if has value"""
+        return value in cls.__members__
+
+class Gender(Enum):
+    """gender enum"""
+    MALE = 'homme'
+    FEMALE = 'femme'
+    OTHER = 'autre'
+
+    @classmethod
+    def has_value(cls, value):
+        """checks if has value"""
+        return value in cls.__members__
 
 class Round:
     """round model class
