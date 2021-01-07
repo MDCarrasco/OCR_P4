@@ -67,15 +67,30 @@ def create_table(mydb, table_name):
     mydb.table(table_name)
 
 @connect
-def insert_one(mydb, name, price, quantity, table_name):
+def insert_one(mydb, item, table_name):
     """inserts one item checking if it is not already there"""
     table_name = scrub(table_name)
     table = mydb.table(table_name)
-    if table.search(where('name') == name):
+    if table_name == 'player':
+        exists = table.search((where('first_name') == item.first_name) &
+                              (where('last_name') == item.last_name))
+    else:
+        exists = table.search(where('name') == item.name)
+    if exists:
         raise mvc_exc.ItemAlreadyStored(
             'Integrity error: "{}" already stored in table "{}"'
-            .format(name, table_name))
-    table.insert({'name': name, 'price': price, 'quantity': quantity})
+            .format(item.name, table_name))
+    if table_name == 'player':
+        table.insert(
+            {'first_name': item.first_name, 'last_name': item.last_name,
+             'birth_date': item.birth_date, 'sex': item.sex,
+             'ranking': item.ranking})
+    else:
+        table.insert(
+            {'name': item.name, 'place': item.place, 'date': item.date,
+             'round_count': item.round_count, 'rounds':item.rounds,
+             'players': item.players, 'time_control': item.time_control,
+             'description': item.description})
 
 @connect
 def insert_many(mydb, items, table_name):
@@ -83,22 +98,36 @@ def insert_many(mydb, items, table_name):
     table_name = scrub(table_name)
     table = mydb.table(table_name)
     for item in items:
-        if table.search(where('name') == item['name']):
+        if table.search((where('name') == item.name) |
+                        ((where('first_name') == item.first_name) &
+                         (where('last_name') == item.last_name))):
             raise mvc_exc.ItemAlreadyStored(
                 'Integrity error: "{}" already stored in table "{}"'
-                .format(item['name'], table_name))
-        table.insert(
-            {'name': item['name'],
-             'price': item['price'],
-             'quantity': item['quantity']})
+                .format(item.name if item.name else
+                        item.name + item.name, table_name))
+        if table_name == 'player':
+            table.insert(
+                {'fist_name': item.first_name, 'last_name': item.last_name,
+                 'birth_date': item.birth_date, 'sex': item.sex,
+                 'ranking': item.ranking})
+        else:
+            table.insert(
+                {'name': item.name, 'place': item.place, 'date': item.date,
+                 'round_count': item.round_count, 'rounds':item.rounds,
+                 'players': item.players, 'time_control': item.time_control,
+                 'description': item.description})
 
 @connect
 def select_one(mydb, item_name, table_name):
     """read one item"""
     table_name = scrub(table_name)
-    item_name = scrub(item_name)
     table = mydb.table(table_name)
-    item = table.search(where('name') == item_name)
+    if table_name == 'player':
+        item = table.search((where('first_name') == item_name.split(' ')[0]) &
+                            (where('last_name') == item_name.split(' ')[1]))
+    else:
+        item_name = scrub(item_name)
+        item = table.search(where('name') == item_name)
     if item:
         return item[0]
     raise mvc_exc.ItemNotStored(
@@ -113,16 +142,30 @@ def select_all(mydb, table_name):
     return table.all()
 
 @connect
-def update_one(mydb, name, price, quantity, table_name):
+def update_one(mydb, item, table_name):
     """update one item"""
     table_name = scrub(table_name)
     table = mydb.table(table_name)
-    if not table.update({'name': name, 'price': price,
-                         'quantity': quantity},
-                        Query().name == name):
-        raise mvc_exc.ItemNotStored(
-            'Can\'t update "{}" because it\'s not stored '
-            'in the table "{}"'.format(name, table_name))
+    if table_name == 'player':
+        if not table.update(
+                {'fist_name': item.first_name, 'last_name': item.last_name,
+                 'birth_date': item.birth_date, 'sex': item.sex,
+                 'ranking': item.ranking}, Query().name == item.fist_name +
+                ' ' + item.last_name):
+            raise mvc_exc.ItemNotStored(
+                'Can\'t update "{}" because it\'s not stored '
+                'in the table "{}"'.format(item.first_name + ' ' +
+                                           item.last_name, table_name))
+    else:
+        if not table.update(
+                {'name': item.name, 'place': item.place, 'date': item.date,
+                 'round_count': item.round_count, 'rounds':item.rounds,
+                 'players': item.players, 'time_control': item.time_control,
+                 'description': item.description}, Query().name == item.name):
+            raise mvc_exc.ItemNotStored(
+                'Can\'t update "{}" because it\'s not stored '
+                'in the table "{}"'.format(item.name, table_name))
+
 '''
 def main():
     """main function"""

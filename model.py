@@ -1,11 +1,13 @@
-"""The model file needs backend logic"""
+"""The model file needs abstract and backend logic"""
+from abc import ABC
 import tinydb_backend
 
-class ModelTinydb():
+class ModelTinydbCarrier(ABC):
     """tinydb model class"""
     def __init__(self, application_items):
-        self._item_type = 'product'
+        self._item_type = None
         self._connection = tinydb_backend.connect_to_db(tinydb_backend.DB_NAME)
+
         tinydb_backend.create_table(self.connection, self._item_type)
         self.create_items(application_items)
 
@@ -23,9 +25,9 @@ class ModelTinydb():
     def item_type(self, new_item_type):
         self._item_type = new_item_type
 
-    def create_item(self, name, price, quantity):
+    def create_item(self, item):
         """inserts an item into db"""
-        tinydb_backend.insert_one(self.connection, name, price, quantity,
+        tinydb_backend.insert_one(self.connection, item,
                                   table_name=self.item_type)
 
     def create_items(self, items):
@@ -43,29 +45,57 @@ class ModelTinydb():
         return tinydb_backend.select_all(self.connection,
                                          table_name=self.item_type)
 
-    def update_item(self, name, price, quantity):
-        """updates an item into db"""
-        tinydb_backend.update_one(self.connection, name, price, quantity,
+    def update_item(self, item):
+        """updates an item in db"""
+        tinydb_backend.update_one(self.connection, item,
                                   table_name=self.item_type)
 
-class Tournament:
-    """tournament model class
-    Tournament :
-        - Name
-        - Place
-        - Date
-        - Round_count
-        - Rounds
-        - Players
-        - Time_control (bullet, blitz, rapid)
-        - Description
+
+class TournamentCarrier(ModelTinydbCarrier):
+    """Tournament Carrier class
+    Establishes connection with the db and R/W one to many tournaments
+    into it
     """
-    def __init__(self):
-        pass
+
+    def __init__(self, tournament_items):
+        self.__item_type = 'tournament'
+        super().__init__(tournament_items)
+
     def method1(self, arg1=None):
         """method1"""
     def method2(self, arg1=None):
         """method2"""
+
+class Tournament:
+    """ Tournament :
+            - Name
+            - Place
+            - Date
+            - Round_count
+            - Rounds
+            - Players
+            - Time_control (bullet, blitz, rapid)
+            - Description
+    """
+
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-instance-attributes
+    def __init__(self, name, place, date, round_count, rounds, players,
+                 time_control, description):
+        self.__name = name
+        self.__place = place
+        self.__date = date
+        self.__round_count = round_count
+        self.__rounds = rounds
+        self.__players = players
+        self.__time_control = time_control
+        self.__description = description
+
+    def method1(self, arg1=None):
+        """method1"""
+    def method2(self, arg1=None):
+        """method2"""
+
 
 class Player:
     """player model class
@@ -76,8 +106,18 @@ class Player:
         - Sex
         - Ranking
     """
-    def __init__(self):
-        pass
+
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-instance-attributes
+
+    def __init__(self, first_name, last_name, birth_date, sex, ranking):
+        self.__item_type = 'player'
+        self.__first_name = first_name
+        self.__last_name = last_name
+        self.__birth_date = birth_date
+        self.__sex = sex
+        self.__ranking = ranking
+
     def method1(self, arg1=None):
         """method1"""
     def method2(self, arg1=None):
