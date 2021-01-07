@@ -66,6 +66,22 @@ class TournamentCarrier(ModelTinydbCarrier):
     def method2(self, arg1=None):
         """method2"""
 
+class PlayerCarrier(ModelTinydbCarrier):
+    """Player Carrier class
+    Establishes connection with the db and R/W one to many players
+    into it
+    """
+
+    def __init__(self, player_items):
+        self.__item_type = 'player'
+        super().__init__(player_items)
+
+    def method1(self, arg1=None):
+        """method1"""
+    def method2(self, arg1=None):
+        """method2"""
+
+
 class Tournament:
     """ Tournament :
             - Name
