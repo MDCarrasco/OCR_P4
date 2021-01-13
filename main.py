@@ -13,7 +13,10 @@ if __name__ == '__main__':
     # check for bugs (there will be for sure)
 
     my_tournament = [
-        some tournament here
+        {
+
+
+        }
     ]
 
     my_players = [

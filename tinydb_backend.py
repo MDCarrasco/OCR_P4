@@ -1,7 +1,7 @@
 """needs tinydb imports"""
-from tinydb import TinyDB #pylint: disable=E0401
-from tinydb import Query #pylint: disable=E0401
-from tinydb import where #pylint: disable=E0401
+from tinydb import TinyDB
+from tinydb import Query
+from tinydb import where
 import mvc_exceptions as mvc_exc
 
 DB_NAME = 'myDB'
@@ -166,7 +166,7 @@ def update_one(mydb, item, table_name):
                 'Can\'t update "{}" because it\'s not stored '
                 'in the table "{}"'.format(item.name, table_name))
 
-# pylint: disable=pointless-string-statement
+#pylint: disable=pointless-string-statement
 '''
 def main():
     """main function"""
