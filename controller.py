@@ -1,5 +1,5 @@
 """needs exceptions"""
-from dateparser import parse #pylint: disable=E0401
+from dateparser import parse
 from model import TimeControl
 from model import Gender
 import mvc_exceptions as mvc_exc

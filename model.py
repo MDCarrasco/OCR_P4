@@ -1,12 +1,12 @@
 """The model file needs abstract and backend logic"""
 from abc import ABC
 from enum import Enum
+import json
 import tinydb_backend
 
 class ModelTinydbCarrier(ABC):
     """tinydb model class"""
     def __init__(self, application_items):
-        self._item_type = None
         self._connection = tinydb_backend.connect_to_db(tinydb_backend.DB_NAME)
 
         tinydb_backend.create_table(self.connection, self._item_type)
@@ -58,9 +58,9 @@ class TournamentCarrier(ModelTinydbCarrier):
     into it
     """
 
-    def __init__(self, tournament_items):
+    def __init__(self, tournament_item):
         self._item_type = 'tournament'
-        super().__init__(tournament_items)
+        super().__init__(tournament_item)
 
 
 
@@ -95,7 +95,6 @@ class Tournament:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
-
     def __init__(self, name, place, date, rounds, players, time_control,
                  description, round_count=4):
         self.name = name
@@ -106,6 +105,11 @@ class Tournament:
         self.players = players
         self.time_control = time_control
         self.description = description
+
+    def to_json(self):
+        """to json"""
+        return json.dumps(self, default=lambda o: o.__dict__,
+            sort_keys=True, indent=4)
 
 class Player:
     """player model class
@@ -120,7 +124,6 @@ class Player:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
-
     def __init__(self, first_name, last_name, birth_date, gender, ranking):
         self.item_type = 'player'
         self.first_name = first_name
@@ -128,6 +131,11 @@ class Player:
         self.birth_date = birth_date
         self.gender = gender
         self.ranking = ranking
+
+    def to_json(self):
+        """to json"""
+        return json.dumps(self, default=lambda o: o.__dict__,
+            sort_keys=True, indent=4)
 
 class TimeControl(Enum):
     """time_control enum"""
@@ -159,25 +167,35 @@ class Round:
         - End_date_time (set when user creates a round and sets it as finished)
         - List of matches
     """
-    def __init__(self):
-        pass
-    def method1(self, arg1=None):
-        """method1"""
-    def method2(self, arg1=None):
-        """method2"""
+
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-few-public-methods
+    def __init__(self, name, start_date_time, end_date_time, matches):
+        self.name = name
+        self.start_date_time = start_date_time
+        self.end_date_time = end_date_time
+        self.matches = matches
+
+    def to_json(self):
+        """to json"""
+        return json.dumps(self, default=lambda o: o.__dict__,
+            sort_keys=True, indent=4)
+
 
 class Match:
     """match model class
     Match :
-        - list of tuples (tuple = (player, player))
-        - list of tuples (tuple = (score, score))
+        - p1 = (player, score)
+        - p2 = (player, score)
+        - contains tuple(p1, p2)
     """
-    def __init__(self):
-        pass
-    def method1(self, arg1=None):
-        """method1"""
-    def method2(self, arg1=None):
-        """method2"""
+
+    # pylint: disable=too-many-arguments
+    # pylint: disable=too-many-instance-attributes
+    # pylint: disable=too-few-public-methods
+    def __init__(self, pone_name, pone_score, ptwo_name, ptwo_score):
+        self.tuple = ([pone_name, pone_score], [ptwo_name, ptwo_score])
 
 class Log:
     """log model class

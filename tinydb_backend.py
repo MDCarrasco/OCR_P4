@@ -3,6 +3,7 @@ from tinydb import TinyDB
 from tinydb import Query
 from tinydb import where
 import mvc_exceptions as mvc_exc
+import json
 
 DB_NAME = 'myDB'
 
@@ -64,6 +65,7 @@ def scrub(input_string):
 def create_table(mydb, table_name):
     """creates a table"""
     table_name = scrub(table_name)
+    print(table_name)
     mydb.table(table_name)
 
 @connect
@@ -98,23 +100,34 @@ def insert_many(mydb, items, table_name):
     table_name = scrub(table_name)
     table = mydb.table(table_name)
     for item in items:
-        if table.search((where('name') == item.name) |
-                        ((where('first_name') == item.first_name) &
-                         (where('last_name') == item.last_name))):
-            raise mvc_exc.ItemAlreadyStored(
-                'Integrity error: "{}" already stored in table "{}"'
-                .format(item.name if item.name else
-                        item.name + item.name, table_name))
         if table_name == 'player':
+            if table.search(((where('first_name') == item.first_name) &
+                            (where('last_name') == item.last_name))):
+                raise mvc_exc.ItemAlreadyStored(
+                    'Integrity error: "{}" already stored in table "{}"'
+                    .format(item.name if item.name else
+                            item.name + item.name, table_name))
             table.insert(
                 {'fist_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
                  'ranking': item.ranking})
         else:
+            if table.search(where('name') == item.name):
+                raise mvc_exc.ItemAlreadyStored(
+                    'Integrity error: "{}" already stored in table "{}"'
+                    .format(item.name if item.name else
+                            item.name + item.name, table_name))
+            rounds = []
+            for roun in item.rounds:
+                rounds.append(roun.to_json())
+            players = []
+            for play in item.players:
+                players.append(play.to_json())
             table.insert(
                 {'name': item.name, 'place': item.place, 'date': item.date,
-                 'round_count': item.round_count, 'rounds':item.rounds,
-                 'players': item.players, 'time_control': item.time_control,
+                 'round_count': item.round_count,
+                 'rounds':rounds, 'players': players,
+                 'time_control': item.time_control,
                  'description': item.description})
 
 @connect
