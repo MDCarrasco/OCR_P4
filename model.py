@@ -1,7 +1,7 @@
 """The model file needs abstract and backend logic"""
 from abc import ABC
-from enum import Enum
 import json
+from backports.strenum import StrEnum
 import tinydb_backend
 
 class ModelTinydbCarrier(ABC):
@@ -79,7 +79,6 @@ class PlayerCarrier(ModelTinydbCarrier):
     def method2(self, arg1=None):
         """method2"""
 
-
 class Tournament:
     """ Tournament :
             - Name
@@ -106,11 +105,6 @@ class Tournament:
         self.time_control = time_control
         self.description = description
 
-    def to_json(self):
-        """to json"""
-        return json.dumps(self, default=lambda o: o.__dict__,
-            sort_keys=True, indent=4)
-
 class Player:
     """player model class
     Player :
@@ -134,10 +128,10 @@ class Player:
 
     def to_json(self):
         """to json"""
-        return json.dumps(self, default=lambda o: o.__dict__,
+        return json.dumps(self, default=play_or_roun_to_dict,
             sort_keys=True, indent=4)
 
-class TimeControl(Enum):
+class TimeControl(StrEnum):
     """time_control enum"""
     BULLET = 'bullet'
     BLITZ = 'blitz'
@@ -148,7 +142,7 @@ class TimeControl(Enum):
         """checks if has value"""
         return value in cls.__members__
 
-class Gender(Enum):
+class Gender(StrEnum):
     """gender enum"""
     MALE = 'homme'
     FEMALE = 'femme'
@@ -179,7 +173,7 @@ class Round:
 
     def to_json(self):
         """to json"""
-        return json.dumps(self, default=lambda o: o.__dict__,
+        return json.dumps(self, default=play_or_roun_to_dict,
             sort_keys=True, indent=4)
 
 
@@ -196,6 +190,25 @@ class Match:
     # pylint: disable=too-few-public-methods
     def __init__(self, pone_name, pone_score, ptwo_name, ptwo_score):
         self.tuple = ([pone_name, pone_score], [ptwo_name, ptwo_score])
+
+def play_or_roun_to_dict(obj):
+    """to dict"""
+    if isinstance(obj, Player):
+        return {
+            'first_name': obj.first_name,
+            'last_name': obj.last_name,
+            'birth_date': obj.birth_date,
+            'gender': obj.gender,
+            'ranking': obj.ranking
+        }
+    if isinstance(obj, Round):
+        return {
+            'name': obj.name,
+            'start_date_time': obj.start_date_time,
+            'end_date_time': obj.end_date_time,
+            'matches': obj.matches
+        }
+    raise TypeError
 
 class Log:
     """log model class

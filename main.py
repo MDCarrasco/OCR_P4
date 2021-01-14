@@ -41,6 +41,16 @@ if __name__ == '__main__':
         Player("Vachier-Lagrave", "Maxime", "21/10/1990", Gender.MALE, 10),
         Player("Scharzenegger", "Arnold", "30/07/1947", Gender.MALE, 78)
     ]
+    #my_players_json = []
+    #my_rounds_json = []
+
+    #for player in my_players:
+        #print(player)
+        #print(player.to_json())
+        #my_players_json.append(player.to_json())
+
+    #for round_ in my_players:
+        #my_rounds_json.append(round_.to_json())
 
     my_tournament = [
         Tournament(
@@ -55,9 +65,9 @@ if __name__ == '__main__':
 
     c = Controller(TournamentCarrier(my_tournament),
                    PlayerCarrier(my_players), View())
-    c.show_items()
+    #c.show_items()
     #c.show_items(bullet_points=True)
-    #c.show_item('Le grand jeu')
+    c.show_item('Le grand jeu')
     #c.show_item('Carrasco')
 
     #c.insert_item('bread', price=1.0, quantity=5)
@@ -70,14 +80,14 @@ if __name__ == '__main__':
     #c.show_items()
 
     # we close the current sqlite database connection explicitly
-    if isinstance(c.models[0], TournamentCarrier):
-        tinydb_backend.disconnect_from_db(c.models[0].connection)
+    #if isinstance(c.models[0], TournamentCarrier):
+        #tinydb_backend.disconnect_from_db(c.models[0].connection)
         # the sqlite backend understands that it needs to open a new connection
-        c.show_items()
-        tinydb_backend.disconnect_from_db(c.models[0].connection)
+        #c.show_items()
+        #tinydb_backend.disconnect_from_db(c.models[0].connection)
     # we close the current sqlite database connection explicitly
-    if isinstance(c.models[1], PlayerCarrier):
-        tinydb_backend.disconnect_from_db(c.models[1].connection)
+    #if isinstance(c.models[1], PlayerCarrier):
+        #tinydb_backend.disconnect_from_db(c.models[1].connection)
         # the sqlite backend understands that it needs to open a new connection
-        c.show_items()
-        tinydb_backend.disconnect_from_db(c.models[1].connection)
+        #c.show_items()
+        #tinydb_backend.disconnect_from_db(c.models[1].connection)
