@@ -3,9 +3,10 @@ from tinydb import TinyDB
 from tinydb import Query
 from tinydb import where
 import mvc_exceptions as mvc_exc
-import json
 
 DB_NAME = 'myDB'
+PLAYER = 'player'
+TOURNAMENT = 'tournament'
 
 def connect_to_db(name=DB_NAME):
     """Connect to a tinyDB. Create the database if there isn't one yet.
@@ -27,7 +28,7 @@ def connect_to_db(name=DB_NAME):
     mydb = TinyDB('{}.json'.format(name))
     TinyDB.DEFAULT_TABLE = 'my-default'
     TinyDB.DEFAULT_TABLE_KWARGS = {'cache_size': 0}
-    print('New connections to tinyDB...')
+    print('New connection to tinyDB...')
     return mydb
 
 def connect(func):
@@ -65,7 +66,6 @@ def scrub(input_string):
 def create_table(mydb, table_name):
     """creates a table"""
     table_name = scrub(table_name)
-    print(table_name)
     mydb.table(table_name)
 
 @connect
@@ -73,25 +73,34 @@ def insert_one(mydb, item, table_name):
     """inserts one item checking if it is not already there"""
     table_name = scrub(table_name)
     table = mydb.table(table_name)
-    if table_name == 'player':
-        exists = table.search((where('first_name') == item.first_name) &
-                              (where('last_name') == item.last_name))
-    else:
-        exists = table.search(where('name') == item.name)
-    if exists:
-        raise mvc_exc.ItemAlreadyStored(
-            'Integrity error: "{}" already stored in table "{}"'
-            .format(item.name, table_name))
-    if table_name == 'player':
+    if table_name == PLAYER:
+        if table.search(((where('first_name') == item.first_name) &
+                         (where('last_name') == item.last_name))):
+            raise mvc_exc.ItemAlreadyStored(
+                'Integrity error: "{}" already stored in table "{}"'
+                .format(item.name if item.name else
+                        item.name + item.name, table_name))
         table.insert(
             {'first_name': item.first_name, 'last_name': item.last_name,
              'birth_date': item.birth_date, 'gender': item.gender,
              'ranking': item.ranking})
     else:
+        if table.search(where('name') == item.name):
+            raise mvc_exc.ItemAlreadyStored(
+                'Integrity error: "{}" already stored in table "{}"'
+                .format(item.name if item.name else
+                        item.name + item.name, table_name))
+        rounds = []
+        for roun in item.rounds:
+            rounds.append(roun.to_json())
+        players = []
+        for play in item.players:
+            players.append(play.to_json())
         table.insert(
             {'name': item.name, 'place': item.place, 'date': item.date,
-             'round_count': item.round_count, 'rounds':item.rounds,
-             'players': item.players, 'time_control': item.time_control,
+             'round_count': item.round_count,
+             'rounds':rounds, 'players': players,
+             'time_control': item.time_control,
              'description': item.description})
 
 @connect
@@ -100,7 +109,7 @@ def insert_many(mydb, items, table_name):
     table_name = scrub(table_name)
     table = mydb.table(table_name)
     for item in items:
-        if table_name == 'player':
+        if table_name == PLAYER:
             if table.search(((where('first_name') == item.first_name) &
                             (where('last_name') == item.last_name))):
                 raise mvc_exc.ItemAlreadyStored(
@@ -108,7 +117,7 @@ def insert_many(mydb, items, table_name):
                     .format(item.name if item.name else
                             item.name + item.name, table_name))
             table.insert(
-                {'fist_name': item.first_name, 'last_name': item.last_name,
+                {'first_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
                  'ranking': item.ranking})
         else:
@@ -135,11 +144,10 @@ def select_one(mydb, item_name, table_name):
     """read one item"""
     table_name = scrub(table_name)
     table = mydb.table(table_name)
-    if table_name == 'player':
+    if table_name == PLAYER:
         item = table.search((where('first_name') == item_name.split(' ')[0]) &
                             (where('last_name') == item_name.split(' ')[1]))
     else:
-        item_name = scrub(item_name)
         item = table.search(where('name') == item_name)
     if item:
         return item[0]
@@ -159,11 +167,11 @@ def update_one(mydb, item, table_name):
     """update one item"""
     table_name = scrub(table_name)
     table = mydb.table(table_name)
-    if table_name == 'player':
+    if table_name == PLAYER:
         if not table.update(
-                {'fist_name': item.first_name, 'last_name': item.last_name,
+                {'first_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
-                 'ranking': item.ranking}, Query().name == item.fist_name +
+                 'ranking': item.ranking}, Query().name == item.first_name +
                 ' ' + item.last_name):
             raise mvc_exc.ItemNotStored(
                 'Can\'t update "{}" because it\'s not stored '
