@@ -1,10 +1,10 @@
 """needs exceptions"""
 from dateparser import parse
-from model import Tournament
-from model import Player
-from model import TimeControl
-from model import Gender
-import mvc_exceptions as mvc_exc
+from app.models.model import Tournament
+from app.models.model import Player
+from app.models.model import TimeControl
+from app.models.model import Gender
+import app.exceptions.mvc_exceptions as mvc_exc
 
 class Controller():
     """contoller class"""

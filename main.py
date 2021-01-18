@@ -1,14 +1,13 @@
 """needs MVC imports"""
-from controller import Controller
-from model import Gender
-from model import TimeControl
-from model import Tournament
-from model import Player
-from model import Round
-from model import TournamentCarrier
-from model import PlayerCarrier
-from view import View
-import tinydb_backend
+from app.controllers import Controller
+from app.models.model import Gender
+from app.models.model import TimeControl
+from app.models.model import Tournament
+from app.models.model import Player
+from app.models.model import Round
+from app.models.model import TournamentCarrier
+from app.models.model import PlayerCarrier
+from app.views.view import View
 
 if __name__ == '__main__':
 
