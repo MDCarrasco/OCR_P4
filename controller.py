@@ -60,12 +60,10 @@ class Controller():
         assert round_count > 0, 'round_count must be greater than 0'
         assert rounds, 'rounds must not be empty'
         assert players, 'players must not be empty'
-        assert isinstance(time_control, TimeControl), ('time_control must be '
-                                                       'a string')
-        assert TimeControl.has_value(time_control), ('time_control must have'
-                                                     ' value: '
-                                                     '\'bullet\','
-                                                     '\'blitz\' or \'rapid\'')
+        assert isinstance(time_control, TimeControl), ('time_control must have'
+                                                       ' value: '
+                                                       '\'bullet\','
+                                                       '\'blitz\' or \'rapid\'')
         assert isinstance(description, str), 'description must be a string'
         item_type = self.tournaments.item_type
         tournament = Tournament(name, place, date, rounds, players,
