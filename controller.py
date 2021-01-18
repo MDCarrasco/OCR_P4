@@ -29,9 +29,10 @@ class Controller():
         except ValueError:
             return False
 
-    def show_items(self, bullet_points=False):
+    def show_all_items(self, models=None, bullet_points=False):
         """shows all items"""
-        models = [self.tournaments, self.players]
+        if not models:
+            models = [self.tournaments, self.players]
         for model in models:
             items = model.read_items()
             item_type = model.item_type
@@ -39,6 +40,16 @@ class Controller():
                 self.view.show_bullet_point_list(item_type, items)
             else:
                 self.view.show_number_point_list(item_type, items)
+
+    def show_all_tournaments(self, bullet_points=False):
+        """shows all tournaments"""
+        models = [self.tournaments]
+        self.show_all_items(models, bullet_points)
+
+    def show_all_players(self, bullet_points=False):
+        """shows all players"""
+        models = [self.players]
+        self.show_all_items(models, bullet_points)
 
     def show_item(self, its_name, its_type):
         """shows item"""
@@ -78,25 +89,24 @@ class Controller():
         """inserts a tournament from a Tournament obj"""
         self.insert_tournament(obj.name, obj.place, obj.date, obj.rounds,
                                obj.players, obj.time_control, obj.description,
-                               round_count=4)
+                               obj.round_count)
 
     def insert_tournament_objs(self, objs):
         """inserts multiple tournaments from a list of Tournament objs"""
         for obj in objs:
             self.insert_tournament_obj(obj)
 
-    def insert_player(self, first_name, last_name, birth_date, gender, ranking):
+    def insert_player(self, last_name, first_name, birth_date, gender, ranking):
         """inserts player"""
         assert self.is_date(
             birth_date), 'birth date cannot be converted to a french date'
-        assert isinstance(gender, Gender) and Gender.has_value(gender), (
-            'gender must be a string of value: '
-            '\'homme\', \'femme\' ou \'autre\'')
+        assert isinstance(gender, Gender), ('gender must be a string of value: '
+                                            '\'homme\', \'femme\' ou \'autre\'')
         assert ranking > 0, 'ranking must greater than 0'
         item_type = self.players.item_type
+        player = Player(last_name, first_name, birth_date, gender, ranking)
         try:
-            self.players.create_item(first_name, last_name,
-                                       birth_date, gender, ranking)
+            self.players.create_item(player)
             self.view.display_item_stored(first_name + ' ' +
                                           last_name, item_type)
         except mvc_exc.ItemAlreadyStored as exc:
@@ -106,7 +116,7 @@ class Controller():
 
     def insert_player_obj(self, obj):
         """inserts a tournament from a Tournament obj"""
-        self.insert_player(obj.first_name, obj.last_name, obj.birth_date,
+        self.insert_player(obj.last_name, obj.first_name, obj.birth_date,
                            obj.gender, obj.ranking)
 
     def insert_player_objs(self, objs):
@@ -114,23 +124,25 @@ class Controller():
         for obj in objs:
             self.insert_player_obj(obj)
 
-    def update_tournament(self, name, place, date, round_count, rounds,
-                          players, time_control, description):
-        """updates item"""
+    def update_tournament(self, name, place, date, rounds, players,
+                          time_control, description, round_count=4):
+        """updates tournament"""
         assert isinstance(place, str), 'place should be a string'
         assert self.is_date(date), 'date cannot be converted to a french date'
         assert round_count > 0, 'round_count must be greater than 0'
         assert rounds, 'rounds must not be empty'
         assert players, 'players must not be empty'
-        assert isinstance(time_control, str) and TimeControl.has_value(
-            time_control), ('time_control must be a string of value: '
-                            '\'bullet\', \'blitz\' or \'rapid\'')
+        assert isinstance(time_control, TimeControl), ('time_control must have'
+                                                       ' value: '
+                                                       '\'bullet\','
+                                                       '\'blitz\' or \'rapid\'')
         assert isinstance(description, str), 'description must be a string'
         item_type = self.tournaments.item_type
+        tournament = Tournament(name, place, date, rounds, players,
+                                time_control, description, round_count)
         try:
             older = self.tournaments.read_item(name)
-            self.tournaments.update_item(name, place, date, round_count, rounds,
-                                       players, time_control, description)
+            self.tournaments.update_item(tournament)
             self.view.display_tournament_updated(
                 name, older['place'], older['date'], older['round_count'],
                 older['rounds'], older['players'], older['time_control'],
@@ -142,24 +154,27 @@ class Controller():
             # we have 2 options : do nothing or call insert_item to add
             # it. self.insert_item(name, price, quantity)
 
-    def update_player(self, first_name, last_name, birth_date, gender, ranking):
-        """updates item"""
+    def update_tournament_obj(self, obj):
+        """updates tournament via obj"""
+        self.update_tournament(obj.name, obj.place, obj.date, obj.rounds,
+                               obj.players, obj.time_control, obj.description,
+                               obj.round_count)
+
+    def update_player(self, last_name, first_name, birth_date, gender, ranking):
+        """updates player"""
         assert self.is_date(
             birth_date), 'birth date cannot be converted to a french date'
-        assert isinstance(gender, str) and Gender.has_value(gender), (
-            'gender must be a string of value: '
-            '\'homme\', \'femme\' ou \'autre\'')
+        assert isinstance(gender, Gender), ('gender must be a string of value: '
+                                            '\'homme\', \'femme\' ou \'autre\'')
         assert ranking > 0, 'ranking must greater than 0'
         item_type = self.players.item_type
+        player = Player(last_name, first_name, birth_date, gender, ranking)
         try:
             older = self.players.read_item(first_name + ' ' + last_name)
-            self.players.update_item(first_name, last_name, birth_date,
-                                       gender, ranking)
+            self.players.update_item(player)
             self.view.display_player_updated(
-                first_name + ' ' + last_name, older['first_name'],
-                older['last_name'], older['birth_date'], older['gender'],
-                older['ranking'], first_name, last_name, birth_date, gender,
-                ranking)
+                first_name + ' ' + last_name, older['birth_date'],
+                older['gender'], older['ranking'], birth_date, gender, ranking)
         except mvc_exc.ItemNotStored as exc:
             self.view.display_item_not_yet_stored_error(first_name + ' ' +
                                                         last_name, item_type,
@@ -167,6 +182,11 @@ class Controller():
             # if the item is not yet stored and we performed an update,
             # we have 2 options : do nothing or call insert_item to add
             # it. self.insert_item(name, price, quantity)
+
+    def update_player_obj(self, obj):
+        """updates player via obj"""
+        self.update_player(obj.last_name, obj.first_name, obj.birth_date,
+                           obj.gender, obj.ranking)
 
 
     def update_tournament_type(self, new_item_type):

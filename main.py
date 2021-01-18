@@ -29,6 +29,11 @@ if __name__ == '__main__':
         Round("round4", "21/21/21", "21/21/21", my_matches)
     ]
 
+    my_player = Player("hey", "heythere", "23/12/1992", Gender.FEMALE, 129)
+
+    my_updated_player = Player("hey", "heythere", "23/11/1800",
+                               Gender.OTHER, 100)
+
     my_players = [
         Player("Carrasco", "Michael", "23/12/1992", Gender.MALE, 299),
         Player("Myers", "Michael", "25/05/1963", Gender.MALE, 23),
@@ -50,6 +55,15 @@ if __name__ == '__main__':
         my_players,
         TimeControl.BLITZ,
         "C'est le plus gros tournoi d'echecs du monde !")
+
+    my_updated_tournament = Tournament(
+        "Le petit jeu",
+        "mise a jour de l'adresse aaaaa",
+        "mise a jour de la dateaaaaa ffdf",
+        my_rounds,
+        my_players,
+        TimeControl.RAPID,
+        "mise a jour de la descriptionsadfasd  fdf sf")
 
     my_tournaments = [
         Tournament(
@@ -91,27 +105,40 @@ if __name__ == '__main__':
             "C'est le plus petit tournoi d'echecs du monde !")
     # insert one tournament Obj version
     c.insert_tournament_obj(my_tournament)
-
-    #insert multiple tournaments
+    # insert multiple tournaments
     c.insert_tournament_objs(my_tournaments)
 
-    '''insert players, question: "est ce qu'une liste de players est
-    forcement associee a un tournoi ? si je modifie un player dans une
-    liste, dois-je modifier la liste directement dans le tournoi ?'''
+    # insert one player details version
+    c.insert_player("test", "bob", "23/12/1992", Gender.MALE, 500)
+    # insert one player Obj version
+    c.insert_player_obj(my_player)
+    # insert multiple players
+    c.insert_player_objs(my_players)
 
     # READ
-    c.show_items()
-    #c.show_items(bullet_points=True)
+    #c.show_all_items()
+    c.show_all_players(bullet_points=True)
+    #c.show_all_tournaments(bullet_points=True)
+    #c.show_all_items(bullet_points=True)
     #c.show_item('Le grand jeu', 'tournament')
-    #c.show_item('Michael Carrasco', 'player')
-
-    #c.show_item('Le petit jeu', 'tournament')
-    #c.insert_player('chocolate', price=2.0, quantity=10)
-    #c.show_item('chocolate')
+    c.show_item('Michael Carrasco', 'player')
 
     # UPDATE
-    #c.update_item('milk', price=1.2, quantity=20)
-    #c.update_item('ice cream', price=3.5, quantity=20)
+    # update tournament details version
+    c.update_tournament("Le petit jeu",
+            "mise a jour de l'adresse",
+            "mise a jour de la date",
+            my_rounds,
+            my_players,
+            TimeControl.RAPID,
+            "mise a jour de la description")
+    # update tournament obj version
+    c.update_tournament_obj(my_updated_tournament)
+    # update player details version
+    c.update_player("test", "bob", "23/11/1900", Gender.FEMALE, 39)
+    # update player obj version
+    c.update_player_obj(my_updated_player)
+    #c.show_item('Le petit jeu', 'tournament')
 
     #c.show_items()
 

@@ -1,4 +1,6 @@
-"""view"""
+"""needs json import"""
+import json
+
 class View():
     """view class"""
 
@@ -81,9 +83,11 @@ class View():
         print('Change {} round count: {} --> {}'
               .format(item, o_round_count, n_round_count))
         print('Change {} rounds: {} --> {}'
-              .format(item, o_rounds, n_rounds))
+              .format(item, o_rounds, json.dumps([
+                  roun.__dict__ for roun in n_rounds])))
         print('Change {} players: {} --> {}'
-              .format(item, o_players, n_players))
+              .format(item, o_players, json.dumps([
+                  play.__dict__ for play in n_players])))
         print('Change {} time control: {} --> {}'
               .format(item, o_time_control, n_time_control))
         print('Change {} description: {} --> {}'
@@ -92,16 +96,12 @@ class View():
 
     @staticmethod
     def display_player_updated(
-            item, o_first_name, o_last_name, o_birth_date, o_gender, o_ranking,
-            n_first_name, n_last_name, n_birth_date, n_gender, n_ranking):
+            item, o_birth_date, o_gender, o_ranking, n_birth_date,
+            n_gender, n_ranking):
         """displays update of an tournament"""
 
         # pylint: disable=too-many-arguments
         print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --')
-        print('Change {} first name: {} --> {}'
-              .format(item, o_first_name, n_first_name))
-        print('Change {} last name: {} --> {}'
-              .format(item, o_last_name, n_last_name))
         print('Change {} birth date: {} --> {}'
               .format(item, o_birth_date, n_birth_date))
         print('Change {} gender: {} --> {}'

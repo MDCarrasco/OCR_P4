@@ -78,8 +78,7 @@ def insert_one(mydb, item, table_name):
                          (where('last_name') == item.last_name))):
             raise mvc_exc.ItemAlreadyStored(
                 'Integrity error: "{}" already stored in table "{}"'
-                .format(item.name if item.name else
-                        item.name + item.name, table_name))
+                .format(item.first_name + ' ' + item.last_name, table_name))
         table.insert(
             {'first_name': item.first_name, 'last_name': item.last_name,
              'birth_date': item.birth_date, 'gender': item.gender,
@@ -171,18 +170,25 @@ def update_one(mydb, item, table_name):
         if not table.update(
                 {'first_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
-                 'ranking': item.ranking}, Query().name == item.first_name +
-                ' ' + item.last_name):
+                 'ranking': item.ranking},
+                ((where('first_name') == item.first_name) &
+                (where('last_name') == item.last_name))):
             raise mvc_exc.ItemNotStored(
                 'Can\'t update "{}" because it\'s not stored '
                 'in the table "{}"'.format(item.first_name + ' ' +
                                            item.last_name, table_name))
     else:
+        rounds = []
+        for roun in item.rounds:
+            rounds.append(roun.to_json())
+        players = []
+        for play in item.players:
+            players.append(play.to_json())
         if not table.update(
                 {'name': item.name, 'place': item.place, 'date': item.date,
-                 'round_count': item.round_count, 'rounds':item.rounds,
-                 'players': item.players, 'time_control': item.time_control,
-                 'description': item.description}, Query().name == item.name):
+                 'round_count': item.round_count, 'rounds':rounds,
+                 'players': players, 'time_control': item.time_control,
+                 'description': item.description}, where('name') == item.name):
             raise mvc_exc.ItemNotStored(
                 'Can\'t update "{}" because it\'s not stored '
                 'in the table "{}"'.format(item.name, table_name))
