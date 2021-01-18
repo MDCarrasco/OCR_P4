@@ -6,11 +6,10 @@ import tinydb_backend
 
 class ModelTinydbCarrier(ABC):
     """tinydb model class"""
-    def __init__(self, application_items):
+    def __init__(self):
         self._connection = tinydb_backend.connect_to_db(tinydb_backend.DB_NAME)
 
         tinydb_backend.create_table(self.connection, self._item_type)
-        self.create_items(application_items)
 
     @property
     def connection(self):
@@ -58,11 +57,9 @@ class TournamentCarrier(ModelTinydbCarrier):
     into it
     """
 
-    def __init__(self, tournament_item):
-        self._item_type = 'tournament'
-        super().__init__(tournament_item)
-
-
+    def __init__(self):
+        self._item_type = tinydb_backend.TOURNAMENT
+        super().__init__()
 
 class PlayerCarrier(ModelTinydbCarrier):
     """Player Carrier class
@@ -70,14 +67,9 @@ class PlayerCarrier(ModelTinydbCarrier):
     into it
     """
 
-    def __init__(self, player_items):
-        self._item_type = 'player'
-        super().__init__(player_items)
-
-    def method1(self, arg1=None):
-        """method1"""
-    def method2(self, arg1=None):
-        """method2"""
+    def __init__(self):
+        self._item_type = tinydb_backend.PLAYER
+        super().__init__()
 
 class Tournament:
     """ Tournament :
@@ -118,10 +110,9 @@ class Player:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
-    def __init__(self, first_name, last_name, birth_date, gender, ranking):
-        self.item_type = 'player'
-        self.first_name = first_name
+    def __init__(self, last_name, first_name, birth_date, gender, ranking):
         self.last_name = last_name
+        self.first_name = first_name
         self.birth_date = birth_date
         self.gender = gender
         self.ranking = ranking
@@ -129,7 +120,7 @@ class Player:
     def to_json(self):
         """to json"""
         return json.dumps(self, default=play_or_roun_to_dict,
-            sort_keys=True, indent=4)
+            sort_keys=True, indent=None)
 
 class TimeControl(StrEnum):
     """time_control enum"""
@@ -140,7 +131,7 @@ class TimeControl(StrEnum):
     @classmethod
     def has_value(cls, value):
         """checks if has value"""
-        return value in cls.__members__
+        return value in cls._value2member_map_
 
 class Gender(StrEnum):
     """gender enum"""
@@ -151,7 +142,7 @@ class Gender(StrEnum):
     @classmethod
     def has_value(cls, value):
         """checks if has value"""
-        return value in cls.__members__
+        return value in cls._value2member_map_
 
 class Round:
     """round model class
@@ -174,7 +165,7 @@ class Round:
     def to_json(self):
         """to json"""
         return json.dumps(self, default=play_or_roun_to_dict,
-            sort_keys=True, indent=4)
+            sort_keys=True, indent=None)
 
 
 class Match:

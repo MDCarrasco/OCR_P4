@@ -41,20 +41,35 @@ if __name__ == '__main__':
         Player("Vachier-Lagrave", "Maxime", "21/10/1990", Gender.MALE, 10),
         Player("Scharzenegger", "Arnold", "30/07/1947", Gender.MALE, 78)
     ]
-    #my_players_json = []
-    #my_rounds_json = []
 
-    #for player in my_players:
-        #print(player)
-        #print(player.to_json())
-        #my_players_json.append(player.to_json())
+    my_tournament = Tournament(
+        "Le grand jeu",
+        "5 avenue Victor Hugo",
+        "23/12/2021",
+        my_rounds,
+        my_players,
+        TimeControl.BLITZ,
+        "C'est le plus gros tournoi d'echecs du monde !")
 
-    #for round_ in my_players:
-        #my_rounds_json.append(round_.to_json())
-
-    my_tournament = [
+    my_tournaments = [
         Tournament(
-            "Le grand jeu",
+            "Tournoi 1",
+            "5 avenue Victor Hugo",
+            "23/12/2021",
+            my_rounds,
+            my_players,
+            TimeControl.BLITZ,
+            "C'est le plus gros tournoi d'echecs du monde !"),
+        Tournament(
+            "Tournoi 2",
+            "5 avenue Victor Hugo",
+            "23/12/2021",
+            my_rounds,
+            my_players,
+            TimeControl.BLITZ,
+            "C'est le plus gros tournoi d'echecs du monde !"),
+        Tournament(
+            "Tournoi 3",
             "5 avenue Victor Hugo",
             "23/12/2021",
             my_rounds,
@@ -63,17 +78,38 @@ if __name__ == '__main__':
             "C'est le plus gros tournoi d'echecs du monde !")
     ]
 
-    c = Controller(TournamentCarrier(my_tournament),
-                   PlayerCarrier(my_players), View())
-    #c.show_items()
-    #c.show_items(bullet_points=True)
-    c.show_item('Le grand jeu')
-    #c.show_item('Carrasco')
+    # CREATE
+    c = Controller(TournamentCarrier(), PlayerCarrier(), View())
 
-    #c.insert_item('bread', price=1.0, quantity=5)
-    #c.insert_item('chocolate', price=2.0, quantity=10)
+    # insert one tournament details version
+    c.insert_tournament("Le petit jeu",
+            "9 rue de la 1ere D.F.L",
+            "24/12/2021",
+            my_rounds,
+            my_players,
+            TimeControl.RAPID,
+            "C'est le plus petit tournoi d'echecs du monde !")
+    # insert one tournament Obj version
+    c.insert_tournament_obj(my_tournament)
+
+    #insert multiple tournaments
+    c.insert_tournament_objs(my_tournaments)
+
+    '''insert players, question: "est ce qu'une liste de players est
+    forcement associee a un tournoi ? si je modifie un player dans une
+    liste, dois-je modifier la liste directement dans le tournoi ?'''
+
+    # READ
+    c.show_items()
+    #c.show_items(bullet_points=True)
+    #c.show_item('Le grand jeu', 'tournament')
+    #c.show_item('Michael Carrasco', 'player')
+
+    #c.show_item('Le petit jeu', 'tournament')
+    #c.insert_player('chocolate', price=2.0, quantity=10)
     #c.show_item('chocolate')
 
+    # UPDATE
     #c.update_item('milk', price=1.2, quantity=20)
     #c.update_item('ice cream', price=3.5, quantity=20)
 
