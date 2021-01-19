@@ -1,10 +1,11 @@
-# app/exceptions/mvc_exceptions.py
-# Created at: Tue Jan 19 2021 19:05:10 GMT+0100 (GMT+01:00)
+# app/views/menu.py
+# Created at: Tue Jan 19 2021 18:24:14 GMT+0100 (GMT+01:00)
 # Copyright 2021 MDCarrasco <michaeldanielcarrasco@gmail.com>
 #
 
 """
-app/exceptions/mvc_exceptions.py
+app/views/menu.py
+Menu of the chess app
 
 Example:
         INSERT example
@@ -35,11 +36,3 @@ __email__ = "<michaeldanielcarrasco@gmail.com>"
 __status__ = "Dev"
 
 
-class ItemAlreadyStored(Exception):
-    """ItemAlreadyStored.
-    """
-
-
-class ItemNotStored(Exception):
-    """ItemNotStored.
-    """
