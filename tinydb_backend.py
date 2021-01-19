@@ -2,7 +2,7 @@
 from tinydb import TinyDB
 from tinydb import Query
 from tinydb import where
-import mvc_exceptions as mvc_exc
+import app.exceptions.mvc_exceptions as mvc_exc
 
 DB_NAME = 'myDB'
 PLAYER = 'player'

@@ -1,5 +1,5 @@
 """needs MVC imports"""
-from app.controllers import Controller
+from app.controllers.controller import Controller
 from app.models.model import Gender
 from app.models.model import TimeControl
 from app.models.model import Tournament
