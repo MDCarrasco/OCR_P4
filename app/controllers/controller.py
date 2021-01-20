@@ -25,10 +25,10 @@ http://google.github.io/styleguide/pyguide.html
 from dateparser import parse
 
 # Owned
-from app.models.model import Tournament
-from app.models.model import Player
-from app.models.model import TimeControl
-from app.models.model import Gender
+from app.models.tournament import Tournament
+from app.models.player import Player
+from app.models.enums import TimeControl
+from app.models.enums import Gender
 import app.exceptions.mvc_exceptions as mvc_exc
 
 __author__ = "Michael Carrasco"
