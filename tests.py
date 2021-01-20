@@ -8,6 +8,7 @@ from app.models.model import Round
 from app.models.model import TournamentCarrier
 from app.models.model import PlayerCarrier
 from app.views.view import View
+from app.views.menu import Menu
 
 if __name__ == '__main__':
 
@@ -115,28 +116,28 @@ if __name__ == '__main__':
     c.insert_player_objs(my_players)
 
     # READ
-    #c.show_all_items()
-    c.show_all_players(bullet_points=True)
+    c.show_all_items()
+    #c.show_all_players(bullet_points=True)
     #c.show_all_tournaments(bullet_points=True)
     #c.show_all_items(bullet_points=True)
     #c.show_item('Le grand jeu', 'tournament')
-    c.show_item('Michael Carrasco', 'player')
+    #c.show_item('Michael Carrasco', 'player')
 
     # UPDATE
     # update tournament details version
-    c.update_tournament("Le petit jeu",
-            "mise a jour de l'adresse",
-            "mise a jour de la date",
-            my_rounds,
-            my_players,
-            TimeControl.RAPID,
-            "mise a jour de la description")
+    #c.update_tournament("Le petit jeu",
+    #        "mise a jour de l'adresse",
+    #        "mise a jour de la date",
+    #        my_rounds,
+    #        my_players,
+    #        TimeControl.RAPID,
+    #        "mise a jour de la description")
     # update tournament obj version
-    c.update_tournament_obj(my_updated_tournament)
+    #c.update_tournament_obj(my_updated_tournament)
     # update player details version
-    c.update_player("test", "bob", "23/11/1900", Gender.FEMALE, 39)
+    #c.update_player("test", "bob", "23/11/1900", Gender.FEMALE, 39)
     # update player obj version
-    c.update_player_obj(my_updated_player)
+    #c.update_player_obj(my_updated_player)
     #c.show_item('Le petit jeu', 'tournament')
 
     #c.show_items()

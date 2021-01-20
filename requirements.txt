@@ -3,4 +3,4 @@ flake8-html
 tinydb
 dateparser
 backports.strenum
-simple-term-menu
+bullet

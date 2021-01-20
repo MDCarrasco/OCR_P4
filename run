@@ -1,0 +1,11 @@
+#!/bin/bash
+
+if [[ \ $*\  == *\ --test\ * ]] || [[ \ $*\  == *\ -t\ * ]]
+then
+    ./bin/entry_point --test
+elif [[ \ $*\  == *\ --clean\ * ]] || [[ \ $*\  == *\ -c\ * ]]
+then
+    ./bin/clean
+else
+    ./bin/entry_point
+fi       
