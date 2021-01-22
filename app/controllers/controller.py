@@ -23,13 +23,14 @@ http://google.github.io/styleguide/pyguide.html
 
 # Other Libs
 from dateparser import parse
+from PyInquirer import Validator, ValidationError
 
 # Owned
-from app.models.tournament import Tournament
-from app.models.player import Player
-from app.models.enums import TimeControl
-from app.models.enums import Gender
-import app.exceptions.mvc_exceptions as mvc_exc
+from models.tournament import Tournament
+from models.player import Player
+from models.enums import TimeControl
+from models.enums import Gender
+import exceptions.mvc_exceptions as mvc_exc
 
 __author__ = "Michael Carrasco"
 __copyright__ = "2021 MDCarrasco <michaeldanielcarrasco@gmail.com>"
@@ -59,7 +60,6 @@ class Controller():
             string
 
         Returns:
-            bool: is_date
         """
         try:
             parse(string)
@@ -326,3 +326,32 @@ class Controller():
         old_item_type = self.players.item_type
         self.players.item_type = new_item_type
         self.view.display_change_item_type(old_item_type, new_item_type)
+
+# pylint: disable=too-few-public-methods
+class NumberValidator(Validator):
+    """NumberValidator.
+    """
+
+    # pylint: disable=raise-missing-from
+    # pylint: disable=no-self-use
+    def validate(self, document):
+        """Summary of validate.
+
+        Args:
+            document
+
+        Raises:
+            ValidationError
+        """
+        try:
+            int(document.text)
+        except ValueError:
+            raise ValidationError(
+                message='Entrez un nombre',
+                cursor_position=len(document.text))  # Move cursor to end
+        try:
+            assert int(document.text) > 0
+        except AssertionError:
+            raise ValidationError(
+                message='Entrez un nombre plus grand que 0',
+                cursor_position=len(document.text))  # Move cursor to end

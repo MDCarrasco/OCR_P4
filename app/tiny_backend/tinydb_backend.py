@@ -28,7 +28,7 @@ from tinydb import TinyDB
 from tinydb import where
 
 # Owned
-import app.exceptions.mvc_exceptions as mvc_exc
+import exceptions.mvc_exceptions as mvc_exc
 
 __author__ = "Michael Carrasco"
 __copyright__ = "2021 MDCarrasco <michaeldanielcarrasco@gmail.com>"

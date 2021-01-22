@@ -26,7 +26,7 @@ from abc import ABC
 from tinydb import TinyDB
 
 # Owned
-import tinydb_backend
+from tiny_backend import tinydb_backend
 
 __author__ = "Michael Carrasco"
 __copyright__ = "2021 MDCarrasco <michaeldanielcarrasco@gmail.com>"

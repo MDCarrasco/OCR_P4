@@ -1,11 +1,11 @@
-# app/views/view.py
+# app/views/logger.py
 # Created at: Tue Jan 19 2021 18:26:15 GMT+0100 (GMT+01:00)
 # Copyright 2021 MDCarrasco <michaeldanielcarrasco@gmail.com>
 #
 
 """
-app/views/view.py
-This is the database actions view file
+app/views/logger.py
+This is the database actions logger file
 
 Example:
         INSERT example
@@ -37,12 +37,12 @@ __email__ = "<michaeldanielcarrasco@gmail.com>"
 __status__ = "Dev"
 
 
-class View():
-    """View.
+class Logger():
+    """Logger.
     """
 
     @staticmethod
-    def show_bullet_point_list(item_type, items):
+    def log_bullet_point_list(item_type, items):
         """Summary of show_bullet_point_list.
 
         Args:
@@ -54,7 +54,7 @@ class View():
             print('* {}'.format(item))
 
     @staticmethod
-    def show_number_point_list(item_type, items):
+    def log_number_point_list(item_type, items):
         """Summary of show_number_point_list.
 
         Args:
@@ -66,7 +66,7 @@ class View():
             print('{}. {}'.format(i+1, item))
 
     @staticmethod
-    def show_item(item_type, item, item_info):
+    def log_item(item_type, item, item_info):
         """Summary of show_item.
 
         Args:
@@ -80,8 +80,8 @@ class View():
         print('//////////////////////////////////////////////////////////////')
 
     @staticmethod
-    def display_missing_item_error(item, err):
-        """Summary of display_missing_item_error.
+    def log_missing_item_error(item, err):
+        """Summary of log_missing_item_error.
 
         Args:
             item
@@ -93,8 +93,8 @@ class View():
         print('**************************************************************')
 
     @staticmethod
-    def display_item_already_stored_error(item, item_type, err):
-        """Summary of display_item_already_stored_error.
+    def log_item_already_stored_error(item, item_type, err):
+        """Summary of log_item_already_stored_error.
 
         Args:
             item
@@ -108,8 +108,8 @@ class View():
         print('**************************************************************')
 
     @staticmethod
-    def display_item_not_yet_stored_error(item, item_type, err):
-        """Summary of display_item_not_yet_stored_error.
+    def log_item_not_yet_stored_error(item, item_type, err):
+        """Summary of log_item_not_yet_stored_error.
 
         Args:
             item
@@ -123,8 +123,8 @@ class View():
         print('**************************************************************')
 
     @staticmethod
-    def display_item_stored(item, item_type):
-        """Summary of display_item_stored.
+    def log_item_stored(item, item_type):
+        """Summary of log_item_stored.
 
         Args:
             item
@@ -136,8 +136,8 @@ class View():
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
     @staticmethod
-    def display_change_item_type(older, newer):
-        """Summary of display_change_item_type.
+    def log_change_item_type(older, newer):
+        """Summary of log_change_item_type.
 
         Args:
             older
@@ -148,11 +148,11 @@ class View():
         print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --')
 
     @staticmethod
-    def display_tournament_updated(
+    def log_tournament_updated(
             item, o_place, o_date, o_round_count, o_rounds, o_players,
             o_time_control, o_description, n_place, n_date, n_round_count,
             n_rounds, n_players, n_time_control, n_description):
-        """Summary of display_tournament_updated.
+        """Summary of log_tournament_updated.
 
         Args:
             item
@@ -193,10 +193,10 @@ class View():
         print('---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --')
 
     @staticmethod
-    def display_player_updated(
+    def log_player_updated(
             item, o_birth_date, o_gender, o_ranking, n_birth_date,
             n_gender, n_ranking):
-        """Summary of display_player_updated.
+        """Summary of log_player_updated.
 
         Args:
             item
