@@ -2,7 +2,7 @@
 
 if [[ \ $*\  == *\ --test\ * ]] || [[ \ $*\  == *\ -t\ * ]]
 then
-    python3 ./tests/tests.py
+    python3 tests
 else
-    python3 app/main.py
+    python3 app
 fi

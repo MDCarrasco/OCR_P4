@@ -61,9 +61,15 @@ class CYSMenu(CliView):
             'message': 'Lieu du tournoi:'
         },
         {
+            'type': 'input',
+            'name': 'date',
+            'message': 'Date du tournoi:'
+        },
+        {
             'type': 'checkbox',
             'message': 'Selectionnez les joueurs',
             'name': 'players',
+            # TODO inserer les joueurs depuis la bdd
             'choices': [
                 {
                     'name': 'player1'
@@ -205,7 +211,8 @@ class CYSMenu(CliView):
         self.main_menu_exit = False
         self.display_menu_back = False
         self.display_sorted_menu_back = False
-        self.main_menu_title = self.title_string("Assistant pour tournois d'echecs")
+        self.main_menu_title = self.title_string(
+            "Assistant pour tournois d'echecs")
         self.main_nemu_items = [
             "[1] Organiser un tournoi", "[2] Ajouter des joueurs",
             "[3] Modifier le classement", "[4] Lancer un tournoi",
@@ -264,6 +271,14 @@ class CYSMenu(CliView):
                 print(self.title_string(
                     "Organisation de tournoi (Ctrl + C pour annuler)"))
                 answers = prompt(CYSMenu.TOURNAMENT_FORM, style=self.style)
+                players = []
+                for p in answers['players']:
+                    player_json = c.show_item()
+
+
+                print(answers['name'], answers['place'], answers['date'], answers['players'])
+                break
+                # c.insert_tournament(answers[])
                 if answers:
                     printd("\nSauvegarde du nouveau tournoi")
             elif main_sel == 1:

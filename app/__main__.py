@@ -1,10 +1,10 @@
-# app/main.py
+# app/__main__.py
 # Created at: Fri Jan 22 2021 15:30:49 GMT+0100 (Central European Standard Time)
 # Copyright 2021 MDCarrasco <michaeldanielcarrasco@gmail.com>
 #
 
 """
-app/main.py
+app/__main__.py
 
 Example:
         INSERT example
@@ -43,5 +43,4 @@ def main():
     menu.start()
     return 0
 
-if __name__ == "__main__":
-    main()
+main()
