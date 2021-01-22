@@ -4,3 +4,4 @@ tinydb
 dateparser
 backports.strenum
 simple_term_menu
+pyinquirer
