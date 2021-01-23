@@ -112,12 +112,12 @@ class TestOne(unittest.TestCase):
         c.insert_player_objs(my_players)
 
         # READ
-        c.show_all_items()
-        #c.show_all_players(bullet_points=True)
-        #c.show_all_tournaments(bullet_points=True)
-        #c.show_all_items(bullet_points=True)
-        #c.show_item('Le grand jeu', 'tournament')
-        #c.show_item('Michael Carrasco', 'player')
+        c.log_all_items()
+        #c.log_all_players(bullet_points=True)
+        #c.log_all_tournaments(bullet_points=True)
+        #c.log_all_items(bullet_points=True)
+        #c.log_item('Le grand jeu', 'tournament')
+        #c.log_item('Michael Carrasco', 'player')
 
         # UPDATE
         # update tournament details version
@@ -134,19 +134,19 @@ class TestOne(unittest.TestCase):
         #c.update_player("test", "bob", "23/11/1900", Gender.FEMALE, 39)
         # update player obj version
         #c.update_player_obj(my_updated_player)
-        #c.show_item('Le petit jeu', 'tournament')
+        #c.log_item('Le petit jeu', 'tournament')
 
-        #c.show_items()
+        #c.log_items()
 
         # we close the current sqlite database connection explicitly
         #if isinstance(c.models[0], TournamentCarrier):
             #tinydb_backend.disconnect_from_db(c.models[0].connection)
             # the sqlite backend understands that it needs to open a new connection
-            #c.show_items()
+            #c.log_items()
             #tinydb_backend.disconnect_from_db(c.models[0].connection)
         # we close the current sqlite database connection explicitly
         #if isinstance(c.models[1], PlayerCarrier):
             #tinydb_backend.disconnect_from_db(c.models[1].connection)
             # the sqlite backend understands that it needs to open a new connection
-            #c.show_items()
+            #c.log_items()
             #tinydb_backend.disconnect_from_db(c.models[1].connection)

@@ -43,7 +43,7 @@ class Logger():
 
     @staticmethod
     def log_bullet_point_list(item_type, items):
-        """Summary of show_bullet_point_list.
+        """Summary of log_bullet_point_list.
 
         Args:
             item_type
@@ -55,7 +55,7 @@ class Logger():
 
     @staticmethod
     def log_number_point_list(item_type, items):
-        """Summary of show_number_point_list.
+        """Summary of log_number_point_list.
 
         Args:
             item_type
@@ -67,7 +67,7 @@ class Logger():
 
     @staticmethod
     def log_item(item_type, item, item_info):
-        """Summary of show_item.
+        """Summary of log_item.
 
         Args:
             item_type

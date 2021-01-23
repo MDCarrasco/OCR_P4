@@ -68,7 +68,7 @@ class Controller():
         except ValueError:
             return False
 
-    def show_all_items(self, models=None, bullet_points=False):
+    def show_all_items(self, models=None):
         """Summary of log_all_items.
 
         Args:
@@ -80,10 +80,7 @@ class Controller():
         for model in models:
             items = model.read_items()
             item_type = model.item_type
-            if bullet_points:
-                self.view.log_bullet_point_list(item_type, items)
-            else:
-                self.view.log_number_point_list(item_type, items)
+            self.view.show_list(item_type, items)
 
 
     def log_all_items(self, models=None, bullet_points=False):
@@ -110,7 +107,7 @@ class Controller():
             bullet_points Default to False
         """
         models = [self.tournaments]
-        self.log_all_items(models, bullet_points)
+        self.show_all_items(models, bullet_points)
 
 
     def log_all_tournaments(self, bullet_points=False):
@@ -129,7 +126,7 @@ class Controller():
             bullet_points Default to False
         """
         models = [self.players]
-        self.log_all_items(models, bullet_points)
+        self.show_all_items(models, bullet_points)
 
 
     def log_all_players(self, bullet_points=False):
@@ -153,7 +150,7 @@ class Controller():
                 item = self.players.read_item(its_name)
             else:
                 item = self.tournaments.read_item(its_name)
-            self.view.log_item(its_type, its_name, item)
+            self.view.show_item(its_type, its_name, item)
         except mvc_exc.ItemNotStored as exc:
             self.view.log_missing_item_error(its_name, exc)
 
