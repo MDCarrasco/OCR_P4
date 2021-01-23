@@ -33,6 +33,9 @@ from PyInquirer import style_from_dict, Token, prompt
 # Owned
 from controllers.controller import Controller, NumberValidator
 from models.carriers import TournamentCarrier, PlayerCarrier
+from models.player  import Player
+from models.round import Round
+from models.enums import TimeControl, Gender
 from views.cli_view import CliView, printd
 from views.logger import Logger
 
@@ -49,96 +52,6 @@ __status__ = "Dev"
 class CYSMenu(CliView):
     """Menu.
     """
-    TOURNAMENT_FORM = [
-        {
-            'type': 'input',
-            'name': 'name',
-            'message': 'Nom du tournoi:'
-        },
-        {
-            'type': 'input',
-            'name': 'place',
-            'message': 'Lieu du tournoi:'
-        },
-        {
-            'type': 'input',
-            'name': 'date',
-            'message': 'Date du tournoi:'
-        },
-        {
-            'type': 'checkbox',
-            'message': 'Selectionnez les joueurs',
-            'name': 'players',
-            # TODO inserer les joueurs depuis la bdd
-            'choices': [
-                {
-                    'name': 'player1'
-                },
-                {
-                    'name': 'player2'
-                },
-                {
-                    'name': 'player3'
-                },
-                {
-                    'name': 'player4'
-                },
-                {
-                    'name': 'player5'
-                },
-                {
-                    'name': 'player6'
-                },
-                {
-                    'name': 'player7'
-                },
-                {
-                    'name': 'player8'
-                },
-                {
-                    'name': 'player9'
-                },
-                {
-                    'name': 'player10'
-                },
-                {
-                    'name': 'player11'
-                },
-                {
-                    'name': 'player12'
-                }
-            ],
-            'validate': lambda choices: 'Vous devez choisir au moins 8 joueurs.'
-            if len(choices['players']) < 8 else True
-        },
-        {
-            'type': 'list',
-            'name': 'time_control',
-            'message': 'Controle du temps:',
-            'choices': ['Bullet', 'Blitz', 'Rapid'],
-            'filter': lambda val: val.lower()
-        },
-        {
-            'type': 'input',
-            'name': 'description',
-            'message': 'Remarques generales:'
-        },
-        {
-            'type': 'input',
-            'name': 'round_count',
-            'message': 'Nombre de tours (superieur a 0 SINON --> 4):',
-            'default': '4',
-            'validate': NumberValidator,
-            'filter': lambda val: int(val) if int(val) > 0 else None
-        },
-        {
-            'type': 'confirm',
-            'name': 'done',
-            'message': 'Tous les champs sont-ils corrects?',
-            'default': False
-        }
-    ]
-
     PLAYER_FORM = [
         {
             'type': 'input',
@@ -159,7 +72,9 @@ class CYSMenu(CliView):
             'type': 'list',
             'name': 'gender',
             'message': 'Genre:',
-            'choices': ['Homme', 'Femme', 'Autre'],
+            'choices': [Gender.MALE,
+                        Gender.FEMALE,
+                        Gender.OTHER],
             'filter': lambda val: val.lower()
         },
         {
@@ -186,28 +101,80 @@ class CYSMenu(CliView):
         },
     ]
 
-    PLAYER_PICK = [
-        {
-            'type': 'list',
-            'name': 'player',
-            'message': 'Selectionnez le joueur',
-            'choices': ['joueur1', 'joueur2', 'joueur3'],
-        },
-        {
-            'type': 'input',
-            'name': 'ranking',
-            'message': 'Nouveau classement:',
-            # TODO mettre en valeur par defaut le classement actuel du joueur
-            # Pour le moment n'affiche que le nom du joueur
-            'default': lambda answers: answers['player'],
-            'validate': NumberValidator,
-            'filter': lambda val: int(val) if int(val) > 0 else None
-        },
-
-    ]
-
     def __init__(self, app_title):
         super().__init__(app_title)
+        self.tournament_form = [
+            {
+                'type': 'input',
+                'name': 'name',
+                'message': 'Nom du tournoi:'
+            },
+            {
+                'type': 'input',
+                'name': 'place',
+                'message': 'Lieu du tournoi:'
+            },
+            {
+                'type': 'input',
+                'name': 'date',
+                'message': 'Date du tournoi:'
+            },
+            {
+                'type': 'checkbox',
+                'message': 'Selectionnez les joueurs',
+                'name': 'players',
+                'choices': [],
+                'validate': lambda choices: 'Vous devez choisir au moins 8 joueurs.'
+                if len(choices['players']) < 8 else True
+            },
+            {
+                'type': 'list',
+                'name': 'time_control',
+                'message': 'Controle du temps:',
+                'choices': [TimeControl.BULLET,
+                            TimeControl.BLITZ,
+                            TimeControl.RAPID],
+                'filter': lambda val: val.lower()
+            },
+            {
+                'type': 'input',
+                'name': 'description',
+                'message': 'Remarques generales:'
+            },
+            {
+                'type': 'input',
+                'name': 'round_count',
+                'message': 'Nombre de tours (superieur a 0 SINON --> 4):',
+                'default': '4',
+                'validate': NumberValidator,
+                'filter': lambda val: int(val) if int(val) > 0 else None
+            },
+            {
+                'type': 'confirm',
+                'name': 'done',
+                'message': 'Tous les champs sont-ils corrects?',
+                'default': False
+            }
+        ]
+        self.player_pick = [
+            {
+                'type': 'list',
+                'name': 'player',
+                'message': 'Selectionnez le joueur',
+                'choices': [],
+            },
+            {
+                'type': 'input',
+                'name': 'ranking',
+                'message': 'Nouveau classement:',
+                # TODO mettre en valeur par defaut le classement actuel du joueur
+                # Pour le moment n'affiche que le nom du joueur
+                'default': lambda answers: answers['player'],
+                'validate': NumberValidator,
+                'filter': lambda val: int(val) if int(val) > 0 else None
+            },
+
+        ]
         self.main_menu_exit = False
         self.display_menu_back = False
         self.display_sorted_menu_back = False
@@ -258,6 +225,7 @@ class CYSMenu(CliView):
             Token.Answer: '#2196f3 bold',
             Token.Question: '',
         })
+        self.logger = Logger()
 
     def start(self):
         # pylint: disable=invalid-name
@@ -270,15 +238,36 @@ class CYSMenu(CliView):
             if main_sel == 0:
                 print(self.title_string(
                     "Organisation de tournoi (Ctrl + C pour annuler)"))
-                answers = prompt(CYSMenu.TOURNAMENT_FORM, style=self.style)
+                for v in c.get_all_players():
+                    self.tournament_form[3]['choices'].append(
+                        {'name': "{} {}".format(
+                            v['first_name'], v['last_name'])
+                         }
+                    )
+                answers = prompt(self.tournament_form, style=self.style)
                 players = []
+                rounds = []
                 for p in answers['players']:
-                    player_json = c.show_item()
-
-
-                print(answers['name'], answers['place'], answers['date'], answers['players'])
-                break
-                # c.insert_tournament(answers[])
+                    player = c.get_item(p, 'player')
+                    players.append(Player(player['last_name'],
+                                          player['first_name'],
+                                          player['birth_date'],
+                                          player['gender'],
+                                          player['ranking']))
+                for i in range(int(answers['round_count'])):
+                    rounds.append(Round("Round{}".format(i),
+                                        answers['date'],
+                                        "TBD",
+                                        [{}]))
+                c.insert_tournament(answers['name'],
+                                    answers['place'],
+                                    answers['date'],
+                                    rounds,
+                                    players,
+                                    TimeControl(answers['time_control'].capitalize()),
+                                    answers['description']
+                                    )
+                # catch error
                 if answers:
                     printd("\nSauvegarde du nouveau tournoi")
             elif main_sel == 1:
@@ -291,7 +280,8 @@ class CYSMenu(CliView):
                 print(self.title_string(
                     "Choix du joueur et modification de son "
                     "classement (Ctrl + C pour annuler)"))
-                player = prompt(CYSMenu.PLAYER_PICK, style=self.style)
+                self.player_pick[0]['choices'] = c.get_all_players()
+                player = prompt(self.player_pick, style=self.style)
                 if player:
                     printd("\nModification du classement")
             elif main_sel == 3:

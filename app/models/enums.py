@@ -40,9 +40,9 @@ class TimeControl(StrEnum):
     """TimeControl.
     """
 
-    BULLET = 'bullet'
-    BLITZ = 'blitz'
-    RAPID = 'rapid'
+    BULLET = 'Bullet'
+    BLITZ = 'Blitz'
+    RAPID = 'Rapid'
 
     # pylint: disable=no-member
     @classmethod
@@ -62,9 +62,9 @@ class Gender(StrEnum):
     """Gender.
     """
 
-    MALE = 'homme'
-    FEMALE = 'femme'
-    OTHER = 'autre'
+    MALE = 'Homme'
+    FEMALE = 'Femme'
+    OTHER = 'Autre'
 
     # pylint: disable=no-member
     @classmethod

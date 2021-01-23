@@ -68,21 +68,6 @@ class Controller():
         except ValueError:
             return False
 
-    def show_all_items(self, models=None):
-        """Summary of log_all_items.
-
-        Args:
-            models Default to None
-            bullet_points Default to False
-        """
-        if not models:
-            models = [self.tournaments, self.players]
-        for model in models:
-            items = model.read_items()
-            item_type = model.item_type
-            self.view.show_list(item_type, items)
-
-
     def log_all_items(self, models=None, bullet_points=False):
         """Summary of log_all_items.
 
@@ -96,18 +81,17 @@ class Controller():
             items = model.read_items()
             item_type = model.item_type
             if bullet_points:
-                self.view.log_bullet_point_list(item_type, items)
+                self.view.logger.log_bullet_point_list(item_type, items)
             else:
-                self.view.log_number_point_list(item_type, items)
+                self.view.logger.log_number_point_list(item_type, items)
 
-    def show_all_tournaments(self, bullet_points=False):
-        """Summary of log_all_tournaments.
+    def get_all_tournaments(self) -> list:
+        """Summary of get_all_tournaments.
 
-        Args:
-            bullet_points Default to False
+        Returns:
+            list: Description of return value
         """
-        models = [self.tournaments]
-        self.show_all_items(models, bullet_points)
+        return self.tournaments.read_items()
 
 
     def log_all_tournaments(self, bullet_points=False):
@@ -119,14 +103,13 @@ class Controller():
         models = [self.tournaments]
         self.log_all_items(models, bullet_points)
 
-    def show_all_players(self, bullet_points=False):
-        """Summary of log_all_players.
+    def get_all_players(self) -> list:
+        """Summary of get_all_players.
 
-        Args:
-            bullet_points Default to False
+        Returns:
+            list: Description of return value
         """
-        models = [self.players]
-        self.show_all_items(models, bullet_points)
+        return self.players.read_items()
 
 
     def log_all_players(self, bullet_points=False):
@@ -138,7 +121,7 @@ class Controller():
         models = [self.players]
         self.log_all_items(models, bullet_points)
 
-    def show_item(self, its_name, its_type):
+    def get_item(self, its_name, its_type):
         """Summary of log_item.
 
         Args:
@@ -147,12 +130,10 @@ class Controller():
         """
         try:
             if its_type == self.players.item_type:
-                item = self.players.read_item(its_name)
-            else:
-                item = self.tournaments.read_item(its_name)
-            self.view.show_item(its_type, its_name, item)
+                return self.players.read_item(its_name)
+            return self.tournaments.read_item(its_name)
         except mvc_exc.ItemNotStored as exc:
-            self.view.log_missing_item_error(its_name, exc)
+            self.view.logger.log_missing_item_error(its_name, exc)
 
 
     def log_item(self, its_name, its_type):
@@ -167,9 +148,9 @@ class Controller():
                 item = self.players.read_item(its_name)
             else:
                 item = self.tournaments.read_item(its_name)
-            self.view.log_item(its_type, its_name, item)
+            self.view.logger.log_item(its_type, its_name, item)
         except mvc_exc.ItemNotStored as exc:
-            self.view.log_missing_item_error(its_name, exc)
+            self.view.logger.log_missing_item_error(its_name, exc)
 
     # pylint: disable=too-many-arguments
     def insert_tournament(self, name, place, date, rounds, players,
@@ -201,9 +182,9 @@ class Controller():
                                 time_control, description, round_count)
         try:
             self.tournaments.create_item(tournament)
-            self.view.log_item_stored(name, item_type)
+            self.view.logger.log_item_stored(name, item_type)
         except mvc_exc.ItemAlreadyStored as exc:
-            self.view.log_item_already_stored_error(name, item_type, exc)
+            self.view.logger.log_item_already_stored_error(name, item_type, exc)
 
     def insert_tournament_obj(self, obj):
         """Summary of insert_tournament_obj.
@@ -243,10 +224,10 @@ class Controller():
         player = Player(last_name, first_name, birth_date, gender, ranking)
         try:
             self.players.create_item(player)
-            self.view.log_item_stored(first_name + ' ' +
+            self.view.logger.log_item_stored(first_name + ' ' +
                                           last_name, item_type)
         except mvc_exc.ItemAlreadyStored as exc:
-            self.view.log_item_already_stored_error(first_name + ' ' +
+            self.view.logger.log_item_already_stored_error(first_name + ' ' +
                                                         last_name, item_type,
                                                         exc)
 
@@ -298,13 +279,13 @@ class Controller():
         try:
             older = self.tournaments.read_item(name)
             self.tournaments.update_item(tournament)
-            self.view.log_tournament_updated(
+            self.view.logger.log_tournament_updated(
                 name, older['place'], older['date'], older['round_count'],
                 older['rounds'], older['players'], older['time_control'],
                 older['description'], place, date, round_count, rounds,
                 players, time_control, description)
         except mvc_exc.ItemNotStored as exc:
-            self.view.log_item_not_yet_stored_error(name, item_type, exc)
+            self.view.logger.log_item_not_yet_stored_error(name, item_type, exc)
             # if the item is not yet stored and we performed an update,
             # we have 2 options : do nothing or call insert_item to add
             # it. self.insert_item(name, price, quantity)
@@ -339,13 +320,13 @@ class Controller():
         try:
             older = self.players.read_item(first_name + ' ' + last_name)
             self.players.update_item(player)
-            self.view.log_player_updated(
+            self.view.logger.log_player_updated(
                 first_name + ' ' + last_name, older['birth_date'],
                 older['gender'], older['ranking'], birth_date, gender, ranking)
         except mvc_exc.ItemNotStored as exc:
-            self.view.log_item_not_yet_stored_error(first_name + ' ' +
-                                                        last_name, item_type,
-                                                        exc)
+            self.view.logger.log_item_not_yet_stored_error(first_name + ' ' +
+                                                           last_name, item_type,
+                                                           exc)
             # if the item is not yet stored and we performed an update,
             # we have 2 options : do nothing or call insert_item to add
             # it. self.insert_item(name, price, quantity)
@@ -367,7 +348,7 @@ class Controller():
         """
         old_item_type = self.tournaments.item_type
         self.tournaments.item_type = new_item_type
-        self.view.log_change_item_type(old_item_type, new_item_type)
+        self.view.logger.log_change_item_type(old_item_type, new_item_type)
 
     def update_player_type(self, new_item_type):
         """Summary of update_player_type.
@@ -377,7 +358,7 @@ class Controller():
         """
         old_item_type = self.players.item_type
         self.players.item_type = new_item_type
-        self.view.log_change_item_type(old_item_type, new_item_type)
+        self.view.logger.log_change_item_type(old_item_type, new_item_type)
 
 # pylint: disable=too-few-public-methods
 class NumberValidator(Validator):

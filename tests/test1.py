@@ -10,6 +10,7 @@ from models.player import Player
 from models.round import Round
 from models.carriers import TournamentCarrier
 from models.carriers import PlayerCarrier
+from views.menu import CYSMenu
 from views.logger import Logger
 
 my_matches = [
@@ -89,7 +90,7 @@ my_tournaments = [
 class TestOne(unittest.TestCase):
     def test_db(self):
         # CREATE
-        c = Controller(TournamentCarrier(), PlayerCarrier(), Logger())
+        c = Controller(TournamentCarrier(), PlayerCarrier(), CYSMenu("Test"))
 
         # insert one tournament details version
         c.insert_tournament("Le petit jeu",
