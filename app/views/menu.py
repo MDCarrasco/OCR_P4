@@ -31,7 +31,7 @@ from simple_term_menu import TerminalMenu
 from PyInquirer import style_from_dict, Token, prompt
 
 # Owned
-from controllers.controller import Controller, NumberValidator
+from controllers.controller import Controller, NumberValidator, DateValidator
 from models.carriers import TournamentCarrier, PlayerCarrier
 from models.player  import Player
 from models.round import Round
@@ -107,7 +107,8 @@ class CYSMenu(CliView):
             {
                 'type': 'input',
                 'name': 'name',
-                'message': 'Nom du tournoi:'
+                'message': 'Nom du tournoi:',
+                'validate': None
             },
             {
                 'type': 'input',
@@ -117,14 +118,15 @@ class CYSMenu(CliView):
             {
                 'type': 'input',
                 'name': 'date',
-                'message': 'Date du tournoi:'
+                'message': 'Date du tournoi:',
+                'validate': DateValidator
             },
             {
                 'type': 'checkbox',
                 'message': 'Selectionnez les joueurs',
                 'name': 'players',
                 'choices': [],
-                'validate': lambda choices: 'Vous devez choisir au moins 8 joueurs.'
+                'validate': lambda choices: 'Vous devez choisir au moins 8 joueurs'
                 if len(choices['players']) < 8 else True
             },
             {
@@ -230,6 +232,9 @@ class CYSMenu(CliView):
     def start(self):
         # pylint: disable=invalid-name
         c = Controller(TournamentCarrier(), PlayerCarrier(), self)
+        # TODO maybe put these somewhere else
+        db_players = c.get_all_players()
+        db_tournaments = c.get_all_tournaments()
 
 
         # pylint: disable=too-many-nested-blocks
@@ -238,7 +243,14 @@ class CYSMenu(CliView):
             if main_sel == 0:
                 print(self.title_string(
                     "Organisation de tournoi (Ctrl + C pour annuler)"))
-                for v in c.get_all_players():
+                self.tournament_form[0]['validate'] = (
+                    lambda name: "Ce nom de "
+                    "tournoi existe deja dans la bdd, choisissez en un autre."
+                    if next(
+                        (d for d in db_tournaments if d["name"] == name),
+                        None) else True
+                )
+                for v in db_players:
                     self.tournament_form[3]['choices'].append(
                         {'name': "{} {}".format(
                             v['first_name'], v['last_name'])
@@ -259,17 +271,17 @@ class CYSMenu(CliView):
                                         answers['date'],
                                         "TBD",
                                         [{}]))
-                c.insert_tournament(answers['name'],
-                                    answers['place'],
-                                    answers['date'],
-                                    rounds,
-                                    players,
-                                    TimeControl(answers['time_control'].capitalize()),
-                                    answers['description']
-                                    )
-                # catch error
-                if answers:
+                if answers['done']:
+                    c.insert_tournament(answers['name'],
+                                        answers['place'],
+                                        answers['date'],
+                                        rounds,
+                                        players,
+                                        TimeControl(answers['time_control'].capitalize()),
+                                        answers['description'])
                     printd("\nSauvegarde du nouveau tournoi")
+                else:
+                    db_players = []
             elif main_sel == 1:
                 print(self.title_string(
                     "Ajout de joueur (Ctrl + C pour annuler)"))

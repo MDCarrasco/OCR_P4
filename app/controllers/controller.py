@@ -23,6 +23,7 @@ http://google.github.io/styleguide/pyguide.html
 
 # Other Libs
 from dateparser import parse
+from datetime import datetime
 from PyInquirer import Validator, ValidationError
 
 # Owned
@@ -60,13 +61,18 @@ class Controller():
             string
 
         Returns:
+            bool
         """
-        try:
-            parse(string)
-            return True
+        return bool(parse(string, settings={'DATE_ORDER': 'DMY',
+                                            'STRICT_PARSING': True}))
 
-        except ValueError:
-            return False
+    @staticmethod
+    def is_future_date(string) -> bool:
+        date = parse(string, settings={'DATE_ORDER': 'DMY',
+                                       'STRICT_PARSING': True})
+        now = datetime.now()
+
+        return bool(date >= now)
 
     def log_all_items(self, models=None, bullet_points=False):
         """Summary of log_all_items.
@@ -387,4 +393,33 @@ class NumberValidator(Validator):
         except AssertionError:
             raise ValidationError(
                 message='Entrez un nombre plus grand que 0',
+                cursor_position=len(document.text))  # Move cursor to end
+
+# pylint: disable=too-few-public-methods
+class DateValidator(Validator):
+    """DateValidator.
+    """
+
+    # pylint: disable=raise-missing-from
+    # pylint: disable=no-self-use
+    def validate(self, document):
+        """Summary of validate.
+
+        Args:
+            document
+
+        Raises:
+            ValidationError
+        """
+        try:
+            assert Controller.is_date(document.text)
+        except (ValueError, AssertionError) as e:
+            raise ValidationError(
+                message='Entrez une date',
+                cursor_position=len(document.text))  # Move cursor to end
+        try:
+            assert Controller.is_future_date(document.text)
+        except AssertionError:
+            raise ValidationError(
+                message='Votre tournoi ne peut avoir lieu avant aujourd\'hui',
                 cursor_position=len(document.text))  # Move cursor to end
