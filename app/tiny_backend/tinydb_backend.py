@@ -146,7 +146,7 @@ def insert_one(mydb, item, table_name):
         table.insert(
             {'first_name': item.first_name, 'last_name': item.last_name,
              'birth_date': item.birth_date, 'gender': item.gender,
-             'ranking': item.ranking})
+             'rank': item.rank})
     else:
         if table.search(where('name') == item.name):
             raise mvc_exc.ItemAlreadyStored(
@@ -192,7 +192,7 @@ def insert_many(mydb, items, table_name):
             table.insert(
                 {'first_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
-                 'ranking': item.ranking})
+                 'rank': item.rank})
         else:
             if table.search(where('name') == item.name):
                 raise mvc_exc.ItemAlreadyStored(
@@ -238,6 +238,28 @@ def select_one(mydb, item_name, table_name):
         'Can\'t read "{}" because it\'s not stored in table "{}"'
         .format(item_name, table_name))
 
+@connect
+def select_one_by_rank(mydb, item_rank, table_name):
+    """Summary of select_one by rank.
+
+    Args:
+        mydb
+        item_rank
+        table_name
+
+    Raises:
+        mvc_exc: ItemNotStored
+    """
+    table_name = scrub(table_name)
+    table = mydb.table(table_name)
+    item = table.search(where('rank') == item_rank)
+    if item:
+        return item[0]
+    raise mvc_exc.ItemNotStored(
+        'Can\'t read "{}" because it\'s not stored in table "{}"'
+        .format(item_rank, table_name))
+
+
 
 @connect
 def select_all(mydb, table_name) -> str:
@@ -274,7 +296,7 @@ def update_one(mydb, item, table_name):
         if not table.update(
                 {'first_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
-                 'ranking': item.ranking},
+                 'rank': item.rank},
                 ((where('first_name') == item.first_name) &
                  (where('last_name') == item.last_name))):
             raise mvc_exc.ItemNotStored(

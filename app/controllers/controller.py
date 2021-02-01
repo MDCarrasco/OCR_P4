@@ -28,7 +28,7 @@ from PyInquirer import Validator, ValidationError
 
 # Owned
 from models.tournament import Tournament
-from models.player import Player
+from models.player import Player, player_to_dict
 from models.enums import TimeControl
 from models.enums import Gender
 import exceptions.mvc_exceptions as mvc_exc
@@ -141,6 +141,12 @@ class Controller():
         except mvc_exc.ItemNotStored as exc:
             self.view.logger.log_missing_item_error(its_name, exc)
 
+    def get_player_by_rank(self, rank):
+        try:
+            return self.players.read_item_by_rank(rank)
+        except mvc_exc.ItemNotStored as exc:
+            self.view.logger.log_missing_item_error(rank, exc)
+
 
     def log_item(self, its_name, its_type):
         """Summary of log_item.
@@ -211,7 +217,7 @@ class Controller():
         for obj in objs:
             self.insert_tournament_obj(obj)
 
-    def insert_player(self, last_name, first_name, birth_date, gender, ranking):
+    def insert_player(self, last_name, first_name, birth_date, gender, rank):
         """Summary of insert_player.
 
         Args:
@@ -219,15 +225,15 @@ class Controller():
             first_name
             birth_date
             gender
-            ranking
+            rank
         """
         assert self.is_date(
             birth_date), 'birth date cannot be converted to a french date'
         assert isinstance(gender, Gender), ('gender must be a string of value: '
                                             '\'homme\', \'femme\' ou \'autre\'')
-        assert ranking > 0, 'ranking must greater than 0'
+        assert rank > 0, 'rank must greater than 0'
         item_type = self.players.item_type
-        player = Player(last_name, first_name, birth_date, gender, ranking)
+        player = Player(last_name, first_name, birth_date, gender, rank)
         try:
             self.players.create_item(player)
             self.view.logger.log_item_stored(first_name + ' ' +
@@ -244,7 +250,7 @@ class Controller():
             obj
         """
         self.insert_player(obj.last_name, obj.first_name, obj.birth_date,
-                           obj.gender, obj.ranking)
+                           obj.gender, obj.rank)
 
     def insert_player_objs(self, objs):
         """Summary of insert_player_objs.
@@ -306,7 +312,7 @@ class Controller():
                                obj.players, obj.time_control, obj.description,
                                obj.round_count)
 
-    def update_player(self, last_name, first_name, birth_date, gender, ranking):
+    def update_player(self, last_name, first_name, birth_date, gender, rank):
         """Summary of update_player.
 
         Args:
@@ -314,21 +320,21 @@ class Controller():
             first_name
             birth_date
             gender
-            ranking
+            rank
         """
         assert self.is_date(
             birth_date), 'birth date cannot be converted to a french date'
         assert isinstance(gender, Gender), ('gender must be a string of value: '
                                             '\'homme\', \'femme\' ou \'autre\'')
-        assert ranking > 0, 'ranking must greater than 0'
+        assert rank > 0, 'rank must greater than 0'
         item_type = self.players.item_type
-        player = Player(last_name, first_name, birth_date, gender, ranking)
+        player = Player(last_name, first_name, birth_date, gender, rank)
         try:
             older = self.players.read_item(first_name + ' ' + last_name)
             self.players.update_item(player)
             self.view.logger.log_player_updated(
                 first_name + ' ' + last_name, older['birth_date'],
-                older['gender'], older['ranking'], birth_date, gender, ranking)
+                older['gender'], older['rank'], birth_date, gender, rank)
         except mvc_exc.ItemNotStored as exc:
             self.view.logger.log_item_not_yet_stored_error(first_name + ' ' +
                                                            last_name, item_type,
@@ -344,7 +350,32 @@ class Controller():
             obj
         """
         self.update_player(obj.last_name, obj.first_name, obj.birth_date,
-                           obj.gender, obj.ranking)
+                           obj.gender, obj.rank)
+
+    def update_player_rank_rec(self, dic, new_rank, up_or_down):
+        """Summary of update_player_rank_rec.
+
+        Args:
+            dic
+            new_rank
+            up_or_down
+        """
+        dup_rank = self.get_player_by_rank(new_rank)
+        if dup_rank:
+            self.update_player_rank_rec(dup_rank, dup_rank['rank'] - up_or_down,
+                                        up_or_down)
+        self.update_player(dic['last_name'], dic['first_name'],
+                           dic['birth_date'], Gender(dic['gender']), new_rank)
+
+    def update_player_rank(self, dic, new_rank):
+        """Summary of update_player_rank.
+
+        Args:
+            dic
+            new_rank
+        """
+        up_or_down = 1 if dic['rank'] - new_rank < 0 else -1
+        self.update_player_rank_rec(dic, new_rank, up_or_down)
 
     def update_tournament_type(self, new_item_type):
         """Summary of update_tournament_type.
@@ -415,8 +446,25 @@ class DateValidator(Validator):
             assert Controller.is_date(document.text)
         except (ValueError, AssertionError) as e:
             raise ValidationError(
-                message='Entrez une date',
+                message='Entrez une date valide',
                 cursor_position=len(document.text))  # Move cursor to end
+
+class FutureDateValidator(DateValidator):
+    """DateValidator.
+    """
+
+    # pylint: disable=raise-missing-from
+    # pylint: disable=no-self-use
+    def validate(self, document):
+        """Summary of validate.
+
+        Args:
+            document
+
+        Raises:
+            ValidationError
+        """
+        super().validate(document)
         try:
             assert Controller.is_future_date(document.text)
         except AssertionError:

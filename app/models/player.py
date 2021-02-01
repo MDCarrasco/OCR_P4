@@ -43,7 +43,7 @@ class Player:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
-    def __init__(self, last_name, first_name, birth_date, gender, ranking):
+    def __init__(self, last_name, first_name, birth_date, gender, rank):
         """Summary of __init__.
 
         Args:
@@ -57,7 +57,7 @@ class Player:
         self.first_name = first_name
         self.birth_date = birth_date
         self.gender = gender
-        self.ranking = ranking
+        self.rank = rank
 
     def to_json(self) -> str:
         """Summary of to_json.
@@ -87,6 +87,6 @@ def player_to_dict(obj) -> dict:
             'last_name': obj.last_name,
             'birth_date': obj.birth_date,
             'gender': obj.gender,
-            'ranking': obj.ranking
+            'rank': obj.rank
         }
     raise TypeError

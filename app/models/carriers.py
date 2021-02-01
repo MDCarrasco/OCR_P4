@@ -106,6 +106,19 @@ class ModelTinydbCarrier(ABC):
         return tinydb_backend.select_one(self.connection, name,
                                          table_name=self.item_type)
 
+    def read_item_by_rank(self, rank) -> str:
+        """Summary of read_item by rank.
+
+        Args:
+            rank
+
+        Returns:
+            str: json string of item that has name as value for 'rank' field
+        """
+        return tinydb_backend.select_one_by_rank(self.connection, rank,
+                                                 table_name=self.item_type)
+
+
     def read_items(self) -> str:
         """Summary of read_items.
 

@@ -75,7 +75,7 @@ class Logger():
             item_info
         """
         print('//////////////////////////////////////////////////////////////')
-        print('Good news, we have some {}!'.format(item.upper()))
+        print('Good news, we have some {}!'.format(str(item).upper()))
         print('{} INFO: {}'.format(item_type.upper(), item_info))
         print('//////////////////////////////////////////////////////////////')
 
@@ -88,7 +88,7 @@ class Logger():
             err
         """
         print('**************************************************************')
-        print('We are sorry, we have no {}!'.format(item.upper()))
+        print('We are sorry, we have no {}!'.format(str(item).upper()))
         print('{}'.format(err.args[0]))
         print('**************************************************************')
 
@@ -103,7 +103,7 @@ class Logger():
         """
         print('**************************************************************')
         print('Hey! We already have {} in our {} list!'
-              .format(item.upper(), item_type))
+              .format(str(item).upper(), item_type))
         print('{}'.format(err.args[0]))
         print('**************************************************************')
 
@@ -118,7 +118,7 @@ class Logger():
         """
         print('**************************************************************')
         print('We don\'t have any {} in our {} list. Please insert it first!'
-              .format(item.upper(), item_type))
+              .format(str(item).upper(), item_type))
         print('{}'.format(err.args[0]))
         print('**************************************************************')
 
@@ -132,7 +132,7 @@ class Logger():
         """
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
         print('Hooray! We have just added some {} to our {} list!'
-              .format(item.upper(), item_type))
+              .format(str(item).upper(), item_type))
         print('++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++')
 
     @staticmethod

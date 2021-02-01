@@ -32,6 +32,7 @@ from PyInquirer import style_from_dict, Token, prompt
 
 # Owned
 from controllers.controller import Controller, NumberValidator, DateValidator
+from controllers.controller import FutureDateValidator
 from models.carriers import TournamentCarrier, PlayerCarrier
 from models.player  import Player
 from models.round import Round
@@ -66,7 +67,8 @@ class CYSMenu(CliView):
         {
             'type': 'input',
             'name': 'birth_date',
-            'message': 'Date de naissance:'
+            'message': 'Date de naissance:',
+            'validate': DateValidator
         },
         {
             'type': 'list',
@@ -79,7 +81,7 @@ class CYSMenu(CliView):
         },
         {
             'type': 'input',
-            'name': 'ranking',
+            'name': 'rank',
             'message': 'Classement:',
             'validate': NumberValidator,
             'filter': lambda val: int(val) if int(val) > 0 else None
@@ -119,7 +121,7 @@ class CYSMenu(CliView):
                 'type': 'input',
                 'name': 'date',
                 'message': 'Date du tournoi:',
-                'validate': DateValidator
+                'validate': FutureDateValidator
             },
             {
                 'type': 'checkbox',
@@ -161,17 +163,14 @@ class CYSMenu(CliView):
         self.player_pick = [
             {
                 'type': 'list',
-                'name': 'player',
+                'name': 'name',
                 'message': 'Selectionnez le joueur',
                 'choices': [],
             },
             {
                 'type': 'input',
-                'name': 'ranking',
+                'name': 'new_rank',
                 'message': 'Nouveau classement:',
-                # TODO mettre en valeur par defaut le classement actuel du joueur
-                # Pour le moment n'affiche que le nom du joueur
-                'default': lambda answers: answers['player'],
                 'validate': NumberValidator,
                 'filter': lambda val: int(val) if int(val) > 0 else None
             },
@@ -183,7 +182,7 @@ class CYSMenu(CliView):
         self.main_menu_title = self.title_string(
             "Assistant pour tournois d'echecs")
         self.main_nemu_items = [
-            "[1] Organiser un tournoi", "[2] Ajouter des joueurs",
+            "[1] Organiser un tournoi", "[2] Ajouter un joueur",
             "[3] Modifier le classement", "[4] Lancer un tournoi",
             "[5] Afficher", "[s] Sauvegarder", "[c] Charger",
             "[q] Quitter"
@@ -259,42 +258,59 @@ class CYSMenu(CliView):
                 answers = prompt(self.tournament_form, style=self.style)
                 players = []
                 rounds = []
-                for p in answers['players']:
-                    player = c.get_item(p, 'player')
-                    players.append(Player(player['last_name'],
-                                          player['first_name'],
-                                          player['birth_date'],
-                                          player['gender'],
-                                          player['ranking']))
-                for i in range(int(answers['round_count'])):
-                    rounds.append(Round("Round{}".format(i),
-                                        answers['date'],
-                                        "TBD",
-                                        [{}]))
-                if answers['done']:
-                    c.insert_tournament(answers['name'],
-                                        answers['place'],
-                                        answers['date'],
-                                        rounds,
-                                        players,
-                                        TimeControl(answers['time_control'].capitalize()),
-                                        answers['description'])
-                    printd("\nSauvegarde du nouveau tournoi")
+                if 'players' in answers and answers['players']:
+                    for p in answers['players']:
+                        player = c.get_item(p, 'player')
+                        players.append(Player(player['last_name'],
+                                              player['first_name'],
+                                              player['birth_date'],
+                                              player['gender'],
+                                              player['ranking']))
+                    for i in range(int(answers['round_count'])):
+                        rounds.append(Round("Round{}".format(i),
+                                            answers['date'],
+                                            "TBD",
+                                            [{}]))
+                    if answers['done']:
+                        c.insert_tournament(answers['name'],
+                                            answers['place'],
+                                            answers['date'],
+                                            rounds,
+                                            players,
+                                            TimeControl(answers['time_control'].capitalize()),
+                                            answers['description'])
+                        printd("\nSauvegarde du nouveau tournoi")
+                    else:
+                        db_players = []
+                elif 'players' in answers and not answers['players']:
+                    db_players = []
+                    printd("\n Vous n'avez pas ajoute de joueur au tournoi, annulation")
                 else:
                     db_players = []
             elif main_sel == 1:
                 print(self.title_string(
                     "Ajout de joueur (Ctrl + C pour annuler)"))
                 answers = prompt(CYSMenu.PLAYER_FORM, style=self.style)
-                if answers:
+                if answers and answers['done']:
+                    c.insert_player(answers['last_name'],
+                                    answers['first_name'],
+                                    answers['gender'],
+                                    answers['rank'])
                     printd("\nSauvegarde du nouveau joueur")
             elif main_sel == 2:
                 print(self.title_string(
                     "Choix du joueur et modification de son "
                     "classement (Ctrl + C pour annuler)"))
-                self.player_pick[0]['choices'] = c.get_all_players()
+                for v in db_players:
+                    self.player_pick[0]['choices'].append(
+                        {'name': "{} {}".format(
+                            v['first_name'], v['last_name'])
+                         }
+                    )
                 player = prompt(self.player_pick, style=self.style)
                 if player:
+                    c.update_player_rank(c.get_item(player['name'], 'player'),
+                                         player['new_rank'])
                     printd("\nModification du classement")
             elif main_sel == 3:
                 print(self.title_string(
@@ -342,7 +358,7 @@ class CYSMenu(CliView):
                                     .format(tournament['tournament'])))
                                 sleep(5)
                             elif display_sorted_sel == 1:
-                                by_ranking = True
+                                by_rank = True
                                 print(self.title_string(
                                     "Liste des joueurs du tournoi"
                                     " {} par classement"
