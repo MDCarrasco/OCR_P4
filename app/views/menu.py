@@ -42,7 +42,6 @@ from models.round import Round
 from models.enums import TimeControl, Gender
 from views.cli_view import CliView, printd
 from views.logger import Logger
-from views.more import More
 
 
 __author__ = "Michael Carrasco"
@@ -334,39 +333,40 @@ class CYSMenu(CliView):
                     if display_sel == 0:
                         while not self.display_sorted_menu_back:
                             display_sorted_sel = self.display_sorted_menu.show()
+                            db_players_objs = []
+                            for plyr in db_players:
+                                db_players_objs.append(
+                                    Player(plyr['last_name'],
+                                           plyr['first_name'],
+                                           plyr['birth_date'],
+                                           plyr['gender'],
+                                           plyr['rank'])
+                                )
                             if display_sorted_sel == 0:
-                                print(
-                                    "Liste des joueurs par ordre alphabetique")
-                                sleep(5)
+                                alpha_p = sorted(
+                                    db_players_objs,
+                                    key=lambda x: x.last_name.upper()
+                                )
+                                pydoc.pager("\n".join(map(str, alpha_p)))
                             elif display_sorted_sel == 1:
-                                print("Liste des joueurs par classement")
-                                sleep(5)
+                                rank_p = sorted(
+                                    db_players_objs, key=lambda x: x.rank
+                                )
+                                pydoc.pager("\n".join(map(str, rank_p)))
                             elif display_sorted_sel == 2:
                                 self.display_sorted_menu_back = True
                         self.display_sorted_menu_back = False
                     elif display_sel == 1:
                         db_tournaments_objs = []
-                        db_tournaments_players_objs = []
                         for trnmt in db_tournaments:
-                            for plyr in trnmt['players']:
-                                plyr_dict = json.loads(plyr)
-                                db_tournaments_players_objs.append(
-                                    Player(plyr_dict['last_name'],
-                                           plyr_dict['first_name'],
-                                           plyr_dict['birth_date'],
-                                           plyr_dict['gender'],
-                                           plyr_dict['rank'])
-                                )
                             db_tournaments_objs.append(
                                 Tournament(trnmt['name'], trnmt['place'],
                                            trnmt['date'], trnmt['rounds'],
-                                           db_tournaments_players_objs,
+                                           trnmt['players'],
                                            trnmt['time_control'],
                                            trnmt['description'],
                                            trnmt['round_count'])
                             )
-                        print(self.title_string(
-                            "Liste des tournois (Ctrl + C pour annuler)"))
                         pydoc.pager("\n".join(map(str, db_tournaments_objs)))
                     elif display_sel == 2:
                         print(self.title_string(

@@ -60,7 +60,9 @@ class Player:
         self.rank = rank
 
     def __str__(self) -> str:
-        return 'Joueur: {} {}\nNaissance: {}\nGenre: {}\nClassement: {}\n'
+        return ('Joueur: {} {}\nNaissance: {}\nGenre: {}\nClassement: {}\n'
+                .format(self.last_name, self.first_name, self.birth_date,
+                        self.gender, self.rank))
 
     def to_json(self) -> str:
         """Summary of to_json.
