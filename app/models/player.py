@@ -51,13 +51,16 @@ class Player:
             first_name
             birth_date
             gender
-            ranking
+            rank
         """
         self.last_name = last_name
         self.first_name = first_name
         self.birth_date = birth_date
         self.gender = gender
         self.rank = rank
+
+    def __str__(self) -> str:
+        return 'Joueur: {} {}\nNaissance: {}\nGenre: {}\nClassement: {}\n'
 
     def to_json(self) -> str:
         """Summary of to_json.

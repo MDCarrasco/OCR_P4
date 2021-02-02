@@ -24,6 +24,8 @@ http://google.github.io/styleguide/pyguide.html
 from time import sleep
 from time import time
 import os
+import json
+import pydoc
 
 # Other Libs
 # pylint: disable=import-error
@@ -34,11 +36,13 @@ from PyInquirer import style_from_dict, Token, prompt
 from controllers.controller import Controller, NumberValidator, DateValidator
 from controllers.controller import FutureDateValidator
 from models.carriers import TournamentCarrier, PlayerCarrier
+from models.tournament import Tournament
 from models.player  import Player
 from models.round import Round
 from models.enums import TimeControl, Gender
 from views.cli_view import CliView, printd
 from views.logger import Logger
+from views.more import More
 
 
 __author__ = "Michael Carrasco"
@@ -341,8 +345,29 @@ class CYSMenu(CliView):
                                 self.display_sorted_menu_back = True
                         self.display_sorted_menu_back = False
                     elif display_sel == 1:
-                        print("Liste des tournois")
-                        sleep(5)
+                        db_tournaments_objs = []
+                        db_tournaments_players_objs = []
+                        for trnmt in db_tournaments:
+                            for plyr in trnmt['players']:
+                                plyr_dict = json.loads(plyr)
+                                db_tournaments_players_objs.append(
+                                    Player(plyr_dict['last_name'],
+                                           plyr_dict['first_name'],
+                                           plyr_dict['birth_date'],
+                                           plyr_dict['gender'],
+                                           plyr_dict['rank'])
+                                )
+                            db_tournaments_objs.append(
+                                Tournament(trnmt['name'], trnmt['place'],
+                                           trnmt['date'], trnmt['rounds'],
+                                           db_tournaments_players_objs,
+                                           trnmt['time_control'],
+                                           trnmt['description'],
+                                           trnmt['round_count'])
+                            )
+                        print(self.title_string(
+                            "Liste des tournois (Ctrl + C pour annuler)"))
+                        pydoc.pager("\n".join(map(str, db_tournaments_objs)))
                     elif display_sel == 2:
                         print(self.title_string(
                             "Choix du tournoi (Ctrl + C pour annuler)"))

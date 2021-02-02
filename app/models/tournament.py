@@ -64,3 +64,16 @@ class Tournament:
         self.players = players
         self.time_control = time_control
         self.description = description
+
+    def __str__(self) -> str:
+        """Summary of __str__.
+
+        Returns:
+            str: Description of return value
+        """
+        return ('\nTournoi: {}\nLieu: {}\nDate: {}\nNombre de tours: {}\n'
+                'Vitesse: {}\nDescription: {}\n'.format(self.name, self.place,
+                                                        self.date,
+                                                        self.round_count,
+                                                        self.time_control,
+                                                        self.description))
