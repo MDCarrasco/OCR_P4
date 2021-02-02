@@ -58,6 +58,15 @@ class Round:
         self.end_date_time = end_date_time
         self.matches = matches
 
+    def __str__(self) -> str:
+        """Summary of __str__.
+
+        Returns:
+            str: Description of return value
+        """
+        return ('Tour: {}\nDepart: {}\nFin: {}\n'
+                .format(self.name, self.start_date_time, self.end_date_time))
+
     def to_json(self) -> str:
         """Summary of to_json.
 

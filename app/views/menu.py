@@ -22,9 +22,9 @@ http://google.github.io/styleguide/pyguide.html
 
 # Generic/Built-in
 from time import sleep
-from time import time
-import os
 import json
+import os
+import re
 import pydoc
 
 # Other Libs
@@ -39,6 +39,7 @@ from models.carriers import TournamentCarrier, PlayerCarrier
 from models.tournament import Tournament
 from models.player  import Player
 from models.round import Round
+from models.match import Match
 from models.enums import TimeControl, Gender
 from views.cli_view import CliView, printd
 from views.logger import Logger
@@ -52,6 +53,16 @@ __version__ = "0.0.1"
 __maintainer__ = "Michael Carrasco"
 __email__ = "<michaeldanielcarrasco@gmail.com>"
 __status__ = "Dev"
+
+
+def list_files(directory="."):
+    """Summary of list_files.
+
+    Args:
+        directory Default to "."
+    """
+    return (file for file in os.listdir(directory)
+            if os.path.isfile(os.path.join(directory, file)))
 
 class CYSMenu(CliView):
     """Menu.
@@ -95,15 +106,6 @@ class CYSMenu(CliView):
             'message': 'Tous les champs sont-ils corrects?',
             'default': False
         }
-    ]
-
-    TOURNAMENT_PICK = [
-        {
-            'type': 'list',
-            'name': 'tournament',
-            'message': 'Selectionnez le tournoi',
-            'choices': ['tournoi1', 'tournoi2', 'tournoi3'],
-        },
     ]
 
     def __init__(self, app_title):
@@ -163,6 +165,14 @@ class CYSMenu(CliView):
                 'default': False
             }
         ]
+        self.tournament_pick = [
+            {
+                'type': 'list',
+                'name': 'tournament',
+                'message': 'Selectionnez le tournoi',
+                'choices': [],
+            },
+        ]
         self.player_pick = [
             {
                 'type': 'list',
@@ -179,15 +189,17 @@ class CYSMenu(CliView):
             },
 
         ]
+        self.load_db_sel = -1
         self.main_menu_exit = False
         self.display_menu_back = False
         self.display_sorted_menu_back = False
+        self.load_db_menu_back = False
         self.main_menu_title = self.title_string(
-            "Assistant pour tournois d'echecs")
+            "Assistant pour tournois d'echecs ({})".format(self.load_db_sel))
         self.main_nemu_items = [
             "[1] Organiser un tournoi", "[2] Ajouter un joueur",
             "[3] Modifier le classement", "[4] Lancer un tournoi",
-            "[5] Afficher", "[s] Sauvegarder", "[c] Charger",
+            "[5] Afficher", "[n] Nouvelle BDD", "[c] Charger",
             "[q] Quitter"
         ]
         self.display_menu_title = self.title_string("Affichage")
@@ -197,8 +209,9 @@ class CYSMenu(CliView):
             "[4] Tous les tours d'un tournoi",
             "[5] Tous les matchs d'un tournoi", "[r] Retour"
         ]
-        self.display_sorted_menu_title = self.title_string(
-            "Tri de la selection")
+        self.display_sorted_menu_title = (
+            self.title_string("Tri de la selection")
+        )
         self.display_sorted_menu_items = ["[1] Par ordre alphabetique",
                                           "[2] Par classement", "[r] Retour"]
         self.main_menu = TerminalMenu(
@@ -218,6 +231,13 @@ class CYSMenu(CliView):
         self.display_sorted_menu = TerminalMenu(
             menu_entries=self.display_sorted_menu_items,
             title=self.display_sorted_menu_title,
+            shortcut_key_highlight_style=self.skhs,
+            cycle_cursor=True,
+            clear_screen=True
+        )
+        self.load_db_menu = TerminalMenu(
+            menu_entries=list_files("./databases"),
+            title=self.title_string("Chargement de BDD"),
             shortcut_key_highlight_style=self.skhs,
             cycle_cursor=True,
             clear_screen=True
@@ -318,7 +338,11 @@ class CYSMenu(CliView):
             elif main_sel == 3:
                 print(self.title_string(
                     "Choix du tournoi (Ctrl + C pour annuler)"))
-                tournament = prompt(CYSMenu.TOURNAMENT_PICK, style=self.style)
+                for v in db_tournaments:
+                    self.tournament_pick[0]['choices'].append(
+                        {'name': "{}".format(v['name'])}
+                    )
+                tournament = prompt(self.tournament_pick, style=self.style)
                 # generation des paires
                 printd("Generation des paires")
                 # affichage des joueurs/paires du round actuet
@@ -371,52 +395,125 @@ class CYSMenu(CliView):
                     elif display_sel == 2:
                         print(self.title_string(
                             "Choix du tournoi (Ctrl + C pour annuler)"))
-                        tournament = prompt(CYSMenu.TOURNAMENT_PICK,
+                        for v in db_tournaments:
+                            self.tournament_pick[0]['choices'].append(
+                                {'name': "{}".format(v['name'])}
+                            )
+                        answer = prompt(self.tournament_pick,
                                             style=self.style)
+                        tournament = c.get_item(answer['tournament'],
+                                                'tournament')
                         while not self.display_sorted_menu_back:
                             display_sorted_sel = self.display_sorted_menu.show()
+                            tournament_players_objs = []
+                            for plyr in tournament['players']:
+                                p = json.loads(plyr)
+                                tournament_players_objs.append(
+                                    Player(p['last_name'],
+                                           p['first_name'],
+                                           p['birth_date'],
+                                           p['gender'],
+                                           p['rank'])
+                                )
                             if display_sorted_sel == 0:
-                                by_alpha = True
-                                print(self.title_string(
-                                    "Liste des joueurs du tournoi"
-                                    " {} par ordre alphabetique"
-                                    .format(tournament['tournament'])))
-                                sleep(5)
+                                alpha_p = sorted(
+                                    tournament_players_objs,
+                                    key=lambda x: x.last_name.upper()
+                                )
+                                pydoc.pager("\n".join(map(str, alpha_p)))
                             elif display_sorted_sel == 1:
-                                by_rank = True
-                                print(self.title_string(
-                                    "Liste des joueurs du tournoi"
-                                    " {} par classement"
-                                    .format(tournament['tournament'])))
-                                sleep(5)
+                                rank_p = sorted(
+                                    tournament_players_objs,
+                                    key=lambda x: x.rank
+                                )
+                                pydoc.pager("\n".join(map(str, rank_p)))
                             elif display_sorted_sel == 2:
                                 self.display_sorted_menu_back = True
                         self.display_sorted_menu_back = False
                     elif display_sel == 3:
                         print(self.title_string(
                             "Choix du tournoi (Ctrl + C pour annuler)"))
-                        tournament = prompt(CYSMenu.TOURNAMENT_PICK,
+                        for v in db_tournaments:
+                            self.tournament_pick[0]['choices'].append(
+                                {'name': "{}".format(v['name'])}
+                            )
+                        answer = prompt(self.tournament_pick,
                                             style=self.style)
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print(self.title_string("Liste des tours du tournoi"
-                                      " {}"
-                                      .format(tournament['tournament'])))
-                        sleep(5)
+                        tournament = c.get_item(answer['tournament'],
+                                                'tournament')
+                        tournament_rounds_objs = []
+                        for rnd in tournament['rounds']:
+                            r = json.loads(rnd)
+                            tournament_rounds_objs.append(
+                                Round(r['name'],
+                                      r['start_date_time'],
+                                      r['end_date_time'],
+                                      r['matches'])
+                            )
+                        pydoc.pager("\n".join(map(str, tournament_rounds_objs)))
                     elif display_sel == 4:
                         print(self.title_string(
                             "Choix du tournoi (Ctrl + C pour annuler)"))
-                        tournament = prompt(CYSMenu.TOURNAMENT_PICK,
+                        for v in db_tournaments:
+                            self.tournament_pick[0]['choices'].append(
+                                {'name': "{}".format(v['name'])}
+                            )
+                        answer = prompt(self.tournament_pick,
                                             style=self.style)
-                        os.system('cls' if os.name == 'nt' else 'clear')
-                        print(self.title_string("Liste des matchs du tournoi"
-                                      " {}".format(tournament['tournament'])))
-                        sleep(5)
+                        tournament = c.get_item(answer['tournament'],
+                                                'tournament')
+                        tournament_matches_objs = []
+                        if any(tournament['rounds']):
+                            print(tournament['rounds'])
+                            for rnd in tournament['rounds']:
+                                r = json.loads(rnd)
+                                if any(r['matches']):
+                                    for m in r['matches']:
+                                        tournament_matches_objs.append(
+                                            Match(m['pone_name'],
+                                                  m['pone_score'],
+                                                  m['ptwo_name'],
+                                                  m['ptwo_score'])
+                                        )
+                                else:
+                                    os.system('clear')
+                                    printd(re.sub('\n$', '', self.title_string(
+                                        'Pas de match dans le {}'
+                                        .format(r['name'])
+                                    )))
+                            if tournament_matches_objs:
+                                os.system('clear')
+                                pydoc.pager("\n".join(
+                                    map(str, tournament_matches_objs)))
+                        else:
+                            os.system('clear')
+                            printd(re.sub('\n$', '', self.title_string(
+                                'Pas de round dans le tournoi: {}'
+                                .format(tournament['name'])
+                            )))
                     elif display_sel == 5:
                         self.display_menu_back = True
                 self.display_menu_back = False
             elif main_sel == 5:
                 printd("Sauvegarde")
             elif main_sel == 6:
-                printd("Chargement")
+                while not self.load_db_menu_back:
+                    self.load_db_sel = self.load_db_menu.show()
+                    if self.load_db_sel != -1:
+                        choice = (list(
+                            list_files("./databases")
+                        )[self.load_db_sel])
+                        self.main_menu_title = self.title_string(
+                            "Assistant pour tournois d'echecs ({})"
+                            .format(choice))
+                        self.main_menu = TerminalMenu(
+                            menu_entries=self.main_nemu_items,
+                            title=self.main_menu_title,
+                            shortcut_key_highlight_style=self.skhs,
+                            cycle_cursor=True,
+                            clear_screen=True
+                        )
+                        self.load_db_menu_back = True
+                self.load_db_menu_back = False
             elif main_sel == 7:
                 self.main_menu_exit = True

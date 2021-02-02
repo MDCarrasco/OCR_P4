@@ -46,7 +46,6 @@ class ModelTinydbCarrier(ABC):
         """__init__.
         """
         self._connection = tinydb_backend.connect_to_db(tinydb_backend.DB_NAME)
-
         tinydb_backend.create_table(self.connection, self._item_type)
 
     @property

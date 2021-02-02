@@ -54,3 +54,42 @@ class Match:
             ptwo_score
         """
         self.tuple = ([pone_name, pone_score], [ptwo_name, ptwo_score])
+
+    def __str__(self) -> str:
+        self.color_winner()
+        return ('{}({}) vs {}({})'.format(self.tuple[0][0], self.tuple[0][1],
+                                          self.tuple[1][0], self.tuple[1][1]))
+
+    def color_winner(self):
+        """color_winner.
+        """
+        if self.tuple[0][1] > self.tuple[1][1]:
+            self.tuple[0][0] = "{}{}{}".format(Bcolors.OKGREEN,
+                                               self.tuple[0][0],
+                                               Bcolors.ENDC)
+        elif self.tuple[0][1] < self.tuple[1][1]:
+            self.tuple[1][0] = "{}{}{}".format(Bcolors.OKGREEN,
+                                               self.tuple[1][0],
+                                               Bcolors.ENDC)
+        else:
+            self.tuple[0][0] = "{}{}{}".format(Bcolors.OKCYAN,
+                                               self.tuple[0][0],
+                                               Bcolors.ENDC)
+            self.tuple[1][0] = "{}{}{}".format(Bcolors.OKCYAN,
+                                               self.tuple[1][0],
+                                               Bcolors.ENDC)
+
+
+class Bcolors:
+    """Bcolors.
+    """
+    # pylint: disable=too-few-public-methods
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKCYAN = '\033[96m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
