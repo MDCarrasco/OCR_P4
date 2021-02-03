@@ -26,6 +26,7 @@ import json
 import os
 import re
 import pydoc
+import gc
 
 # Other Libs
 # pylint: disable=import-error
@@ -34,7 +35,8 @@ from PyInquirer import style_from_dict, Token, prompt
 
 # Owned
 from controllers.controller import Controller, NumberValidator, DateValidator
-from controllers.controller import FutureDateValidator
+from controllers.controller import FutureDateValidator, StringValidator
+# from models.bcolors import Bcolors
 from models.carriers import TournamentCarrier, PlayerCarrier
 from models.tournament import Tournament
 from models.player  import Player
@@ -64,63 +66,88 @@ def list_files(directory="."):
     return (file for file in os.listdir(directory)
             if os.path.isfile(os.path.join(directory, file)))
 
+def database_is_not_empty(filename) -> bool:
+    """Summary of database_is_not_empty.
+
+    Args:
+        filename
+
+    Returns:
+        bool: Description of return value
+    """
+    return os.path.getsize("./databases/{}".format(filename)) > 0
+
 class CYSMenu(CliView):
     """Menu.
     """
-    PLAYER_FORM = [
+    DB_NAME_FORM = [
         {
             'type': 'input',
-            'name': 'first_name',
-            'message': 'Prenom:'
+            'name': 'db_name',
+            'message': 'Nom de la nouvelle BDD:',
+            'validate': StringValidator,
+            'filter': lambda val: "".join(x for x in val if x.isalnum())
         },
-        {
-            'type': 'input',
-            'name': 'last_name',
-            'message': 'Nom de famille:'
-        },
-        {
-            'type': 'input',
-            'name': 'birth_date',
-            'message': 'Date de naissance:',
-            'validate': DateValidator
-        },
-        {
-            'type': 'list',
-            'name': 'gender',
-            'message': 'Genre:',
-            'choices': [Gender.MALE,
-                        Gender.FEMALE,
-                        Gender.OTHER],
-            'filter': lambda val: val.lower()
-        },
-        {
-            'type': 'input',
-            'name': 'rank',
-            'message': 'Classement:',
-            'validate': NumberValidator,
-            'filter': lambda val: int(val) if int(val) > 0 else None
-        },
-        {
-            'type': 'confirm',
-            'name': 'done',
-            'message': 'Tous les champs sont-ils corrects?',
-            'default': False
-        }
     ]
+
+
 
     def __init__(self, app_title):
         super().__init__(app_title)
+        self.player_form = [
+            {
+                'type': 'input',
+                'name': 'first_name',
+                'message': 'Prenom:',
+                'validate': StringValidator
+            },
+            {
+                'type': 'input',
+                'name': 'last_name',
+                'message': 'Nom de famille:',
+                'validate': StringValidator
+            },
+            {
+                'type': 'input',
+                'name': 'birth_date',
+                'message': 'Date de naissance:',
+                'validate': DateValidator
+            },
+            {
+                'type': 'list',
+                'name': 'gender',
+                'message': 'Genre:',
+                'choices': [Gender.MALE,
+                            Gender.FEMALE,
+                            Gender.OTHER],
+                'filter': lambda val: val.lower()
+            },
+            {
+                'type': 'input',
+                'name': 'rank',
+                'message': 'Classement:',
+                'validate': None,
+                'filter': lambda val: int(val) if int(val) > 0 else None
+            },
+            {
+                'type': 'confirm',
+                'name': 'done',
+                'message': 'Tous les champs sont-ils corrects?',
+                'default': False
+            }
+        ]
         self.tournament_form = [
             {
                 'type': 'input',
                 'name': 'name',
                 'message': 'Nom du tournoi:',
-                'validate': None
+                'validate': StringValidator
             },
             {
                 'type': 'input',
                 'name': 'place',
-                'message': 'Lieu du tournoi:'
+                'message': 'Lieu du tournoi:',
+                'validate': StringValidator
             },
             {
                 'type': 'input',
@@ -148,7 +175,8 @@ class CYSMenu(CliView):
             {
                 'type': 'input',
                 'name': 'description',
-                'message': 'Remarques generales:'
+                'message': 'Remarques generales:',
+                'validate': None
             },
             {
                 'type': 'input',
@@ -194,6 +222,7 @@ class CYSMenu(CliView):
         self.display_menu_back = False
         self.display_sorted_menu_back = False
         self.load_db_menu_back = False
+        self.db_files = list(list_files("./databases"))
         self.main_menu_title = self.title_string(
             "Assistant pour tournois d'echecs ({})".format(self.load_db_sel))
         self.main_nemu_items = [
@@ -236,7 +265,7 @@ class CYSMenu(CliView):
             clear_screen=True
         )
         self.load_db_menu = TerminalMenu(
-            menu_entries=list_files("./databases"),
+            menu_entries=self.db_files,
             title=self.title_string("Chargement de BDD"),
             shortcut_key_highlight_style=self.skhs,
             cycle_cursor=True,
@@ -253,16 +282,18 @@ class CYSMenu(CliView):
 
     def start(self):
         # pylint: disable=invalid-name
-        c = Controller(TournamentCarrier(), PlayerCarrier(), self)
-        # TODO maybe put these somewhere else
-        db_players = c.get_all_players()
-        db_tournaments = c.get_all_tournaments()
-
+        gc.collect()
+        c = lambda: None
+        db_players = []
+        db_tournaments = []
 
         # pylint: disable=too-many-nested-blocks
         while not self.main_menu_exit:
-            main_sel = self.main_menu.show()
-            if main_sel == 0:
+            if self.load_db_sel == -1:
+                main_sel = 6
+            else:
+                main_sel = self.main_menu.show()
+            if main_sel == 0 and len(db_players) > 3:
                 print(self.title_string(
                     "Organisation de tournoi (Ctrl + C pour annuler)"))
                 self.tournament_form[0]['validate'] = (
@@ -270,7 +301,7 @@ class CYSMenu(CliView):
                     "tournoi existe deja dans la bdd, choisissez en un autre."
                     if next(
                         (d for d in db_tournaments if d["name"] == name),
-                        None) else True
+                        None) else ("Entrez un nom." if not name else True)
                 )
                 for v in db_players:
                     self.tournament_form[3]['choices'].append(
@@ -288,7 +319,7 @@ class CYSMenu(CliView):
                                               player['first_name'],
                                               player['birth_date'],
                                               player['gender'],
-                                              player['ranking']))
+                                              player['rank']))
                     for i in range(int(answers['round_count'])):
                         rounds.append(Round("Round{}".format(i),
                                             answers['date'],
@@ -302,6 +333,7 @@ class CYSMenu(CliView):
                                             players,
                                             TimeControl(answers['time_control'].capitalize()),
                                             answers['description'])
+                        db_tournaments = c.get_all_tournaments()
                         printd("\nSauvegarde du nouveau tournoi")
                     else:
                         db_players = []
@@ -311,16 +343,27 @@ class CYSMenu(CliView):
                 else:
                     db_players = []
             elif main_sel == 1:
+                db_players = c.get_all_players()
                 print(self.title_string(
                     "Ajout de joueur (Ctrl + C pour annuler)"))
-                answers = prompt(CYSMenu.PLAYER_FORM, style=self.style)
+                self.player_form[4]['validate'] = (
+                    lambda rank: "Entrez un nombre positif."
+                    if not rank.isdigit() or int(rank) <= 0
+                    else ("Il existe deja un joueur avec ce classement "
+                    "dans la bdd."
+                    if next((d for d in db_players if d["rank"] == int(rank)),
+                            None) else True)
+                )
+                answers = prompt(self.player_form, style=self.style)
                 if answers and answers['done']:
                     c.insert_player(answers['last_name'],
                                     answers['first_name'],
-                                    answers['gender'],
+                                    answers['birth_date'],
+                                    Gender(answers['gender'].capitalize()),
                                     answers['rank'])
+                    db_players = c.get_all_players()
                     printd("\nSauvegarde du nouveau joueur")
-            elif main_sel == 2:
+            elif main_sel == 2 and db_players:
                 print(self.title_string(
                     "Choix du joueur et modification de son "
                     "classement (Ctrl + C pour annuler)"))
@@ -335,7 +378,7 @@ class CYSMenu(CliView):
                     c.update_player_rank(c.get_item(player['name'], 'player'),
                                          player['new_rank'])
                     printd("\nModification du classement")
-            elif main_sel == 3:
+            elif main_sel == 3 and db_tournaments:
                 print(self.title_string(
                     "Choix du tournoi (Ctrl + C pour annuler)"))
                 for v in db_tournaments:
@@ -354,9 +397,11 @@ class CYSMenu(CliView):
             elif main_sel == 4:
                 while not self.display_menu_back:
                     display_sel = self.display_menu.show()
-                    if display_sel == 0:
+                    if display_sel == 0 and db_players:
                         while not self.display_sorted_menu_back:
-                            display_sorted_sel = self.display_sorted_menu.show()
+                            display_sorted_sel = (
+                                self.display_sorted_menu.show()
+                            )
                             db_players_objs = []
                             for plyr in db_players:
                                 db_players_objs.append(
@@ -380,7 +425,7 @@ class CYSMenu(CliView):
                             elif display_sorted_sel == 2:
                                 self.display_sorted_menu_back = True
                         self.display_sorted_menu_back = False
-                    elif display_sel == 1:
+                    elif display_sel == 1 and db_tournaments:
                         db_tournaments_objs = []
                         for trnmt in db_tournaments:
                             db_tournaments_objs.append(
@@ -391,8 +436,10 @@ class CYSMenu(CliView):
                                            trnmt['description'],
                                            trnmt['round_count'])
                             )
-                        pydoc.pager("\n".join(map(str, db_tournaments_objs)))
-                    elif display_sel == 2:
+                        pydoc.pager(
+                            "\n".join(map(str, db_tournaments_objs))
+                        )
+                    elif display_sel == 2 and db_tournaments:
                         print(self.title_string(
                             "Choix du tournoi (Ctrl + C pour annuler)"))
                         for v in db_tournaments:
@@ -404,7 +451,9 @@ class CYSMenu(CliView):
                         tournament = c.get_item(answer['tournament'],
                                                 'tournament')
                         while not self.display_sorted_menu_back:
-                            display_sorted_sel = self.display_sorted_menu.show()
+                            display_sorted_sel = (
+                                self.display_sorted_menu.show()
+                            )
                             tournament_players_objs = []
                             for plyr in tournament['players']:
                                 p = json.loads(plyr)
@@ -430,7 +479,7 @@ class CYSMenu(CliView):
                             elif display_sorted_sel == 2:
                                 self.display_sorted_menu_back = True
                         self.display_sorted_menu_back = False
-                    elif display_sel == 3:
+                    elif display_sel == 3 and db_tournaments:
                         print(self.title_string(
                             "Choix du tournoi (Ctrl + C pour annuler)"))
                         for v in db_tournaments:
@@ -450,8 +499,10 @@ class CYSMenu(CliView):
                                       r['end_date_time'],
                                       r['matches'])
                             )
-                        pydoc.pager("\n".join(map(str, tournament_rounds_objs)))
-                    elif display_sel == 4:
+                        pydoc.pager("\n".join(
+                            map(str, tournament_rounds_objs)
+                        ))
+                    elif display_sel == 4 and db_tournaments:
                         print(self.title_string(
                             "Choix du tournoi (Ctrl + C pour annuler)"))
                         for v in db_tournaments:
@@ -477,10 +528,12 @@ class CYSMenu(CliView):
                                         )
                                 else:
                                     os.system('clear')
-                                    printd(re.sub('\n$', '', self.title_string(
-                                        'Pas de match dans le {}'
-                                        .format(r['name'])
-                                    )))
+                                    printd(
+                                        re.sub('\n$', '', self.title_string(
+                                            'Pas de match dans le {}'
+                                            .format(r['name'])
+                                        ))
+                                    )
                             if tournament_matches_objs:
                                 os.system('clear')
                                 pydoc.pager("\n".join(
@@ -495,14 +548,45 @@ class CYSMenu(CliView):
                         self.display_menu_back = True
                 self.display_menu_back = False
             elif main_sel == 5:
-                printd("Sauvegarde")
+                print(self.title_string(
+                    "Creation d'une nouvelle BDD (Ctrl + C pour annuler)"))
+                choice = prompt(CYSMenu.DB_NAME_FORM, style=self.style)
+                if 'db_name' in choice and choice['db_name']:
+                    self.main_menu_title = self.title_string(
+                        "Assistant pour tournois d'echecs ({})"
+                        .format(choice['db_name'] + ".json"))
+                    self.main_menu = TerminalMenu(
+                        menu_entries=self.main_nemu_items,
+                        title=self.main_menu_title,
+                        shortcut_key_highlight_style=self.skhs,
+                        cycle_cursor=True,
+                        clear_screen=True
+                    )
+                    c.disconnect()
+                    c = Controller(TournamentCarrier(choice['db_name']),
+                                   PlayerCarrier(choice['db_name']),
+                                   self)
+                    db_players = c.get_all_players()
+                    db_tournaments = c.get_all_tournaments()
+                    self.db_files = list(list_files("./databases"))
+                    printd("Sauvegarde")
             elif main_sel == 6:
+                self.db_files = list(list_files("./databases"))
+                self.load_db_menu = TerminalMenu(
+                    menu_entries=self.db_files,
+                    title=self.title_string("Chargement de BDD"),
+                    shortcut_key_highlight_style=self.skhs,
+                    cycle_cursor=True,
+                    clear_screen=True
+                )
                 while not self.load_db_menu_back:
                     self.load_db_sel = self.load_db_menu.show()
-                    if self.load_db_sel != -1:
-                        choice = (list(
-                            list_files("./databases")
-                        )[self.load_db_sel])
+                    if self.load_db_sel != -1 and self.load_db_sel is not None:
+                        choice = self.db_files[self.load_db_sel]
+                        # if database_is_not_empty(choice):
+                            # coloredchoice = Bcolors.apply_green(choice)
+                        # else:
+                            # coloredchoice = Bcolors.apply_warning(choice)
                         self.main_menu_title = self.title_string(
                             "Assistant pour tournois d'echecs ({})"
                             .format(choice))
@@ -513,6 +597,13 @@ class CYSMenu(CliView):
                             cycle_cursor=True,
                             clear_screen=True
                         )
+                        if isinstance(c, Controller):
+                            c.disconnect()
+                        c = Controller(TournamentCarrier(choice.split('.')[0]),
+                                       PlayerCarrier(choice.split('.')[0]),
+                                       self)
+                        db_players = c.get_all_players()
+                        db_tournaments = c.get_all_tournaments()
                         self.load_db_menu_back = True
                 self.load_db_menu_back = False
             elif main_sel == 7:

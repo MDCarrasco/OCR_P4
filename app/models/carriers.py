@@ -42,11 +42,12 @@ class ModelTinydbCarrier(ABC):
     """ModelTinydbCarrier.
     """
 
-    def __init__(self):
+    def __init__(self, db_name):
         """__init__.
         """
-        self._connection = tinydb_backend.connect_to_db(tinydb_backend.DB_NAME)
-        tinydb_backend.create_table(self.connection, self._item_type)
+        self._db_name = db_name
+        self._connection = tinydb_backend.connect_to_db(self._db_name)
+        tinydb_backend.create_table(self._connection, self._item_type)
 
     @property
     def connection(self) -> TinyDB:
@@ -136,24 +137,29 @@ class ModelTinydbCarrier(ABC):
         tinydb_backend.update_one(self.connection, item,
                                   table_name=self.item_type)
 
+    def disconnect(self):
+        """disconnect.
+        """
+        tinydb_backend.disconnect_from_db(self.connection)
+
 
 class TournamentCarrier(ModelTinydbCarrier):
     """TournamentCarrier.
     """
 
-    def __init__(self):
+    def __init__(self, db_name):
         """__init__.
         """
         self._item_type = tinydb_backend.TOURNAMENT
-        super().__init__()
+        super().__init__(db_name)
 
 
 class PlayerCarrier(ModelTinydbCarrier):
     """PlayerCarrier.
     """
 
-    def __init__(self):
+    def __init__(self, db_name):
         """__init__.
         """
         self._item_type = tinydb_backend.PLAYER
-        super().__init__()
+        super().__init__(db_name)

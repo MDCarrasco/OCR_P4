@@ -40,12 +40,11 @@ __email__ = "<michaeldanielcarrasco@gmail.com>"
 __status__ = "Dev"
 
 
-DB_NAME = 'myDB'
 PLAYER = 'player'
 TOURNAMENT = 'tournament'
 
 
-def connect_to_db(name=DB_NAME) -> TinyDB:
+def connect_to_db(name) -> TinyDB:
     """Summary of connect_to_db.
     Connect to a tinyDB. Create the database if there isn't one yet.
     Open a connection to a tinyDB
@@ -54,15 +53,15 @@ def connect_to_db(name=DB_NAME) -> TinyDB:
     transaction is committed.
 
     Args:
-        name Default to DB_NAME
+        name
 
     Returns:
         TinyDB: db object
     """
-    mydb = TinyDB('{}.json'.format(name))
+    mydb = TinyDB('./databases/{}.json'.format(name))
     TinyDB.DEFAULT_TABLE = 'my-default'
     TinyDB.DEFAULT_TABLE_KWARGS = {'cache_size': 0}
-    print('New connection to tinyDB...')
+    print('New connection to tinyDB ({})...'.format(name))
     return mydb
 
 
@@ -81,7 +80,7 @@ def connect(func) -> Callable:
         try:
             mydb.tables()
         except ValueError:
-            mydb = connect_to_db()
+            print("This database does not exist!!\n")
         return func(mydb, *args, **kwargs)
     return inner_func
 

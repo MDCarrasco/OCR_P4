@@ -31,6 +31,7 @@ from models.tournament import Tournament
 from models.player import Player, player_to_dict
 from models.enums import TimeControl
 from models.enums import Gender
+from models.carriers import TournamentCarrier, PlayerCarrier
 import exceptions.mvc_exceptions as mvc_exc
 
 __author__ = "Michael Carrasco"
@@ -397,6 +398,14 @@ class Controller():
         self.players.item_type = new_item_type
         self.view.logger.log_change_item_type(old_item_type, new_item_type)
 
+    def disconnect(self):
+        """disconnect.
+        """
+        if isinstance(self.tournaments, TournamentCarrier):
+            self.tournaments.disconnect()
+        if isinstance(self.players, PlayerCarrier):
+            self.players.disconnect()
+
 # pylint: disable=too-few-public-methods
 class NumberValidator(Validator):
     """NumberValidator.
@@ -425,6 +434,29 @@ class NumberValidator(Validator):
             raise ValidationError(
                 message='Entrez un nombre plus grand que 0',
                 cursor_position=len(document.text))  # Move cursor to end
+
+
+# pylint: disable=too-few-public-methods
+class StringValidator(Validator):
+    """StringValidator.
+    """
+
+    # pylint: disable=raise-missing-from
+    # pylint: disable=no-self-use
+    def validate(self, document):
+        """Summary of validate.
+
+        Args:
+            document
+
+        Raises:
+            ValidationError
+        """
+        try:
+            assert document.text
+        except AssertionError:
+            raise ValidationError(
+                message='Vous n\'avez rien renseigne, CTRL + C pour quitter...')
 
 # pylint: disable=too-few-public-methods
 class DateValidator(Validator):

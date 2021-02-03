@@ -25,6 +25,7 @@ http://google.github.io/styleguide/pyguide.html
 # Other Libs
 
 # Owned
+from models.bcolors import Bcolors
 
 
 __author__ = "Michael Carrasco"
@@ -78,18 +79,3 @@ class Match:
             self.tuple[1][0] = "{}{}{}".format(Bcolors.OKCYAN,
                                                self.tuple[1][0],
                                                Bcolors.ENDC)
-
-
-class Bcolors:
-    """Bcolors.
-    """
-    # pylint: disable=too-few-public-methods
-    HEADER = '\033[95m'
-    OKBLUE = '\033[94m'
-    OKCYAN = '\033[96m'
-    OKGREEN = '\033[92m'
-    WARNING = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
