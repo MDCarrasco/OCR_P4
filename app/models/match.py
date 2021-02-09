@@ -55,27 +55,30 @@ class Match:
             ptwo_score
         """
         self.tuple = ([pone_name, pone_score], [ptwo_name, ptwo_score])
+        self.coloredtuple = ([pone_name, pone_score], [ptwo_name, ptwo_score])
 
     def __str__(self) -> str:
         self.color_winner()
-        return ('{}({}) vs {}({})'.format(self.tuple[0][0], self.tuple[0][1],
-                                          self.tuple[1][0], self.tuple[1][1]))
+        return ('{}({}) vs {}({})'.format(self.coloredtuple[0][0],
+                                          self.coloredtuple[0][1],
+                                          self.coloredtuple[1][0],
+                                          self.coloredtuple[1][1]))
 
     def color_winner(self):
         """color_winner.
         """
         if self.tuple[0][1] > self.tuple[1][1]:
-            self.tuple[0][0] = "{}{}{}".format(Bcolors.OKGREEN,
-                                               self.tuple[0][0],
-                                               Bcolors.ENDC)
+            self.coloredtuple[0][0] = "{}{}{}".format(Bcolors.OKGREEN,
+                                                      self.tuple[0][0],
+                                                      Bcolors.ENDC)
         elif self.tuple[0][1] < self.tuple[1][1]:
-            self.tuple[1][0] = "{}{}{}".format(Bcolors.OKGREEN,
-                                               self.tuple[1][0],
-                                               Bcolors.ENDC)
+            self.coloredtuple[1][0] = "{}{}{}".format(Bcolors.OKGREEN,
+                                                      self.tuple[1][0],
+                                                      Bcolors.ENDC)
         else:
-            self.tuple[0][0] = "{}{}{}".format(Bcolors.OKCYAN,
-                                               self.tuple[0][0],
-                                               Bcolors.ENDC)
-            self.tuple[1][0] = "{}{}{}".format(Bcolors.OKCYAN,
-                                               self.tuple[1][0],
-                                               Bcolors.ENDC)
+            self.coloredtuple[0][0] = "{}{}{}".format(Bcolors.OKCYAN,
+                                                      self.tuple[0][0],
+                                                      Bcolors.ENDC)
+            self.coloredtuple[1][0] = "{}{}{}".format(Bcolors.OKCYAN,
+                                                      self.tuple[1][0],
+                                                      Bcolors.ENDC)

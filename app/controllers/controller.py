@@ -27,6 +27,7 @@ import os
 import itertools
 from typing import Union
 from datetime import datetime
+from time import sleep
 
 # Other Libs
 from simple_term_menu import TerminalMenu
@@ -605,8 +606,7 @@ class Controller():
                 # generation des paires
                 if 'tournament' in choice and choice['tournament']:
                     view.clear()
-                    view.print_title_string(SubMTitles
-                                            .LAUNCH_TOURNAMENT)
+                    view.print_title_string(SubMTitles.LAUNCH_TOURNAMENT)
                     c.start_tournament(choice['tournament'])
                     view.printd("Generation des paires pour le tournoi {}"
                                 .format(choice['tournament']))
@@ -614,12 +614,10 @@ class Controller():
                     winners = []
                     tied = []
                     tournament = c.get_item(choice['tournament'], 'tournament')
-                    for i, r in itertools.zip_longest(
-                        range(1, tournament['round_count']),
-                            tournament['rounds']):
-                        if i is None:
-                            break
-                        print(len(r['matches']))
+                    # print(tournament['rounds'])
+                    for i in range(1, tournament['round_count'] + 1):
+                        tournament = c.get_item(choice['tournament'], 'tournament')
+                        r = tournament['rounds'][i - 1]
                         for m in r['matches']:
                             if (m['pone_name'] != "Pas d'adversaire" and
                                     m['ptwo_name'] != "Pas d'adversaire"):
@@ -627,15 +625,19 @@ class Controller():
                                                              m['ptwo_name'],
                                                              'Aucun']
                                 winner = view.prompt_form(view.who_won)
-                                print(i)
-                                if winner == 'Aucun':
+                                if 'fullname' in winner and winner['fullname'] == 'Aucun':
                                     tied.append(m['pone_name'])
                                     tied.append(m['ptwo_name'])
-                                else:
+                                elif 'fullname' in winner and winner['fullname'] != 'Aucun':
                                     winners.append(winner['fullname'])
+                            elif m['pone_name'] == "Pas d'adversaire":
+                                winners.append(m['ptwo_name'])
+                            else:
+                                winners.append(m['pone_name'])
                         c.next_round(choice['tournament'], winners=winners,
                                      tied=tied, i=i)
                         winners = []
+                        tied = []
                         view.who_won[0]['choices'] = []
                     c.end_tournament(choice['tournament'])
                     view.print_title_string(SubMTitles
@@ -729,7 +731,9 @@ class Controller():
                                                     'tournament')
                         view.clear()
                         tournament_matches =[]
-                        for rnd in tournament.rounds:
+                        for i, rnd in zip(range(1, len(tournament.rounds) + 1),
+                                          tournament.rounds):
+                            tournament_matches.append('-----Round {}-----'.format(i))
                             for match in rnd.matches:
                                 tournament_matches.append(match)
                         view.print_pydoc(tournament_matches)
@@ -808,11 +812,10 @@ class Controller():
         tournament = self.get_obj(tournament_name, 'tournament')
         tournament.start(now)
         self.update_tournament_obj(tournament)
-        self.next_round(tournament_name, tournament.rounds)
+        self.next_round(tournament_name)
 
     # pylint:disable=too-many-branches
-    def next_round(self, tournament_name, winners=None, tied=None,
-                   rounds=None, i=0):
+    def next_round(self, tournament_name, winners=None, tied=None, i=0):
         """Summary of next_round.
 
         Args:
@@ -822,35 +825,17 @@ class Controller():
             matches Default to None
             i Default to 0
         """
-        # TODO maybe use this
-        rounds = []
-        rounds.append("fixme")
-        #
         now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         tournament = self.get_obj(tournament_name, 'tournament')
         if i != 0:
             tournament.rounds[i - 1].end_date_time = now
         if i < tournament.round_count:
             tournament.rounds[i].start_date_time = now
-        if winners:
-            for winner in winners:
-                for match in tournament.rounds[i - 1].matches:
-                    if match.tuple[0][0] == winner:
-                        match.tuple[0][1] += 1
-                    elif match.tuple[1][0] == winner:
-                        match.tuple[1][1] += 1
-        if tied:
-            for tie in tied:
-                for match in tournament.rounds[i - 1].matches:
-                    if match.tuple[0][0] == tie:
-                        match.tuple[0][1] += 0.5
-                    elif match.tuple[1][0] == tie:
-                        match.tuple[1][1] += 0.5
-        matches = []
-        for rnd in tournament.rounds:
-            for match in rnd.matches:
-                matches.append(match)
-        tournament.proceed(winners, tied, matches, i - 1)
+        for p in tournament.players:
+            print("name {}".format(p.first_name + " " + p.last_name))
+            print("current_score: {}".format(p.current_score))
+        if winners is not None and tied is not None:
+            tournament.proceed(winners, tied, i - 1)
         self.update_tournament_obj(tournament)
 
     def end_tournament(self, tournament_name):

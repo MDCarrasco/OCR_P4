@@ -185,7 +185,7 @@ class CYSMenu(CliView):
             {
                 'type': 'list',
                 'name': 'fullname',
-                'message': 'Selectionnez le vaiqueur',
+                'message': 'Selectionnez le vainqueur',
                 'choices': [],
             },
         ]

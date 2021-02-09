@@ -91,7 +91,6 @@ def round_to_dict(obj) -> dict:
     Raises:
         TypeError
     """
-    print(type(obj))
     if isinstance(obj, Round):
         return {
             'name': obj.name,

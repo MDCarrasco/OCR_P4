@@ -106,43 +106,59 @@ class Tournament:
         if length > middle_index*2:
             matches.append(Match("Pas d'adversaire", 0,
                                  second_half[middle_index].first_name + ' ' +
-                                 second_half[middle_index].last_name, 1))
+                                 second_half[middle_index].last_name, 0))
         for i in range(self.round_count):
             if i == 0:
                 self.rounds.append(Round("Round {}".format(i + 1),
                                          date_time, "", matches))
             else:
+                matches = []
                 self.rounds.append(Round("Round {}".format(i + 1),
                                          "", "", matches))
 
-    def proceed(self, winners, tied, matches, idx):
-        if winners or tied:
-            for winner in winners:
+    def proceed(self, winners, tied, idx):
+        """Summary of proceed.
+
+        Args:
+            winners
+            tied
+            matches
+            idx
+        """
+        matches = []
+        for winner in winners:
+            play = next((x for x in self.players if x.first_name + ' ' +
+                         x.last_name == winner), None)
+            if play:
+                # print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                # print("This is the winner {}".format(play.first_name))
+                # print("HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH")
+                play.match_score = 1
+                play.current_score += play.match_score
+        if tied:
+            for tie in tied:
                 play = next((x for x in self.players if x.first_name + ' ' +
-                             x.last_name == winner), None)
+                            x.last_name == tie), None)
                 if play:
-                    play.current_score += 1
-            if tied:
-                for t in tied:
-                    play = next((x for x in self.players if x.first_name + ' ' +
-                                x.last_name == t), None)
-                    if play:
-                        play.current_score += 0.5
-        points_or_rank_p = sorted(self.players, key=lambda x:
-                                  (x.current_score, x.rank))
-        if matches:
+                    play.match_score = 0.5
+                    play.current_score += play.match_score
+        if idx != self.round_count - 1:
+            # for p in self.players:
+                # print("name: {}".format(p.first_name + " " + p.last_name))
+                # print("current_score: {}".format(p.current_score))
+            points_or_rank_p = sorted(self.players, key=lambda x: (-x.current_score, x.rank))
+            # for p in points_or_rank_p:
+                # print(p)
             for i in range(0, len(points_or_rank_p), 2):
                 try:
                     matches.append(Match(points_or_rank_p[i].first_name + ' ' +
-                                     points_or_rank_p[i].last_name,
-                                     0,
-                                     points_or_rank_p[i + 1].first_name + ' ' +
-                                     points_or_rank_p[i + 1].last_name,
-                                     0))
+                                    points_or_rank_p[i].last_name,
+                                    points_or_rank_p[i].match_score,
+                                    points_or_rank_p[i + 1].first_name + ' ' +
+                                    points_or_rank_p[i + 1].last_name,
+                                    points_or_rank_p[i + 1].match_score))
                 except:
                     matches.append(Match("Pas d'adversaire", 0,
-                                     points_or_rank_p[i].first_name + ' ' +
-                                     points_or_rank_p[i].last_name, 1))
-            print(idx)
-            print(len(self.rounds))
-            self.rounds[idx].matches = matches
+                                    points_or_rank_p[i].first_name + ' ' +
+                                    points_or_rank_p[i].last_name, 1))
+            self.rounds[idx + 1].matches = matches
