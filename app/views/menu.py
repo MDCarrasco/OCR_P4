@@ -138,17 +138,17 @@ class CYSMenu(CliView):
             },
             {
                 'type': 'input',
-                'name': 'description',
-                'message': 'Remarques generales:',
-                'validate': None
-            },
-            {
-                'type': 'input',
                 'name': 'round_count',
                 'message': 'Nombre de tours (superieur a 0 SINON --> 4):',
                 'default': '4',
                 'validate': NumberValidator,
                 'filter': lambda val: int(val) if int(val) > 0 else None
+            },
+            {
+                'type': 'input',
+                'name': 'description',
+                'message': 'Remarques generales:',
+                'validate': None
             },
             {
                 'type': 'confirm',
@@ -235,7 +235,7 @@ class CYSMenu(CliView):
             clear_screen=True
         )
         self.display_sorted_menu = TerminalMenu(
-            menu_entries=self.title_string(SubMTitles.DISPLAY_SORTED),
+            menu_entries=self.display_sorted_menu_items,
             title=self.title_string(SubMTitles.DISPLAY_SORTED),
             shortcut_key_highlight_style=self.skhs,
             cycle_cursor=True,

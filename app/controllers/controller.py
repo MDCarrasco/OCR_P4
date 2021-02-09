@@ -147,8 +147,8 @@ class Controller():
                                                  play['gender'],
                                                  play['rank']))
         return Tournament(item['name'], item['place'], item['date'],
-                          tournament_rounds_objs, tournament_player_objs,
-                          item['time_control'], item['description'],
+                          tournament_player_objs, item['time_control'],
+                          item['description'], tournament_rounds_objs,
                           item['round_count'])
 
     def log_item(self, its_name, its_type):
@@ -201,9 +201,12 @@ class Controller():
         items = self.get_all_tournaments()
         objs = []
         for item in items:
-            objs.append(Tournament(item['name'], item['place'], item['date'],
-                          item['rounds'], item['players'], item['time_control'],
-                          item['description'], item['round_count']))
+            objs.append(
+                Tournament(item['name'], item['place'], item['date'],
+                           item['players'], item['time_control'],
+                           item['description'], item['rounds'],
+                           item['round_count'])
+            )
         return objs
 
 
@@ -362,8 +365,8 @@ class Controller():
         for obj in objs:
             self.insert_player_obj(obj)
 
-    def update_tournament(self, name, place, date, rounds, players,
-                          time_control, description, round_count=4):
+    def update_tournament(self, name, place, date, players, time_control,
+                          description, rounds, round_count=4):
         """Summary of update_tournament.
 
         Args:
@@ -387,8 +390,8 @@ class Controller():
                                                        '\'Blitz\' or \'Rapid\'')
         assert isinstance(description, str), 'description must be a string'
         item_type = self.tournaments.item_type
-        tournament = Tournament(name, place, date, rounds, players,
-                                time_control, description, round_count)
+        tournament = Tournament(name, place, date, players, time_control,
+                                description, rounds, round_count)
         try:
             older = self.tournaments.read_item(name)
             self.tournaments.update_item(tournament)
@@ -409,9 +412,9 @@ class Controller():
         Args:
             obj
         """
-        self.update_tournament(obj.name, obj.place, obj.date, obj.rounds,
-                               obj.players, obj.time_control, obj.description,
-                               obj.round_count)
+        self.update_tournament(obj.name, obj.place, obj.date, obj.players,
+                               obj.time_control, obj.description,
+                               obj.rounds, obj.round_count)
 
     def update_player(self, last_name, first_name, birth_date, gender, rank):
         """Summary of update_player.

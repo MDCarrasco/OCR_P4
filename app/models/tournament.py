@@ -45,8 +45,8 @@ class Tournament:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
-    def __init__(self, name, place, date, rounds, players, time_control,
-                 description, round_count=4):
+    def __init__(self, name, place, date, players, time_control,
+                 description, rounds=[], round_count=4):
         """Summary of __init__.
 
         Args:
