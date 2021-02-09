@@ -42,7 +42,7 @@ class Logger():
     """
     def __init__(self, db_name):
         self.logs_folder = './logs/'
-        self.start_datetime = strftime('%d/%m/%Y_%T')
+        self.start_datetime = strftime('%d-%m-%Y_%T')
         self.logfile = '{}info_{}.log'.format(self.logs_folder,
                                               self.start_datetime)
         self.file = open(self.logfile, 'a')

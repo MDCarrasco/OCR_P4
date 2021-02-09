@@ -21,6 +21,7 @@ http://google.github.io/styleguide/pyguide.html
 # Futures
 
 # Generic/Built-in
+import json
 
 # Other Libs
 from typing import Callable
@@ -305,10 +306,10 @@ def update_one(mydb, item, table_name):
     else:
         rounds = []
         for roun in item.rounds:
-            rounds.append(roun.to_json())
+            rounds.append(json.loads(roun.to_json()))
         players = []
         for play in item.players:
-            players.append(play.to_json())
+            players.append(json.loads(play.to_json()))
         if not table.update(
                 {'name': item.name, 'place': item.place, 'date': item.date,
                  'round_count': item.round_count, 'rounds': rounds,

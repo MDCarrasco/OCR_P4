@@ -43,7 +43,8 @@ class Player:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
-    def __init__(self, last_name, first_name, birth_date, gender, rank):
+    def __init__(self, last_name, first_name, birth_date, gender, rank,
+                 current_score=0):
         """Summary of __init__.
 
         Args:
@@ -58,6 +59,7 @@ class Player:
         self.birth_date = birth_date
         self.gender = gender
         self.rank = rank
+        self.current_score = current_score
 
     def __str__(self) -> str:
         return ('Joueur: {} {}\nNaissance: {}\nGenre: {}\nClassement: {}\n'

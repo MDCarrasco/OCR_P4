@@ -26,6 +26,8 @@ import json
 # Other Libs
 
 # Owned
+from models.match import Match
+from models.player import Player
 
 __author__ = "Michael Carrasco"
 __copyright__ = "2021 MDCarrasco <michaeldanielcarrasco@gmail.com>"
@@ -89,11 +91,27 @@ def round_to_dict(obj) -> dict:
     Raises:
         TypeError
     """
+    print(type(obj))
     if isinstance(obj, Round):
         return {
             'name': obj.name,
             'start_date_time': obj.start_date_time,
             'end_date_time': obj.end_date_time,
             'matches': obj.matches
+        }
+    if isinstance(obj, Match):
+        return {
+            'pone_name': obj.tuple[0][0],
+            'pone_score': obj.tuple[0][1],
+            'ptwo_name': obj.tuple[1][0],
+            'ptwo_score': obj.tuple[1][1]
+        }
+    if isinstance(obj, Player):
+        return {
+            'last_name': obj.last_name,
+            'first_name': obj.first_name,
+            'birth_date': obj.birth_date,
+            'gender': obj.gender,
+            'rank': obj.rank
         }
     raise TypeError

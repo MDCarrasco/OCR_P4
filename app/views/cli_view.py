@@ -21,6 +21,7 @@ http://google.github.io/styleguide/pyguide.html
 # Futures
 
 # Generic/Built-in
+import os
 from time import sleep
 from time import time
 
@@ -65,25 +66,32 @@ class CliView():
                                    .renderText(self.app_title), string)
 
 
-def printd(text, duration=4, delay=.5):
-    """Summary of printd.
+    @staticmethod
+    def printd(text, duration=4, delay=.5):
+        """Summary of printd.
 
-    Args:
-        text
-        duration Default to 4
-        delay Default to .5
-    """
-    print(end=text)
-    t_end = time() + duration
-    n_dots = 0
+         Args:
+             text
+             duration Default to 4
+             delay Default to .5
+         """
+        print(end=text)
+        t_end = time() + duration
+        n_dots = 0
 
-    while time() < t_end:
-        if n_dots == 3:
-            print(end='\b\b\b', flush=True)
-            print(end='   ',    flush=True)
-            print(end='\b\b\b', flush=True)
-            n_dots = 0
-        else:
-            print(end='.', flush=True)
-            n_dots += 1
-        sleep(delay)
+        while time() < t_end:
+            if n_dots == 3:
+                print(end='\b\b\b', flush=True)
+                print(end='   ',    flush=True)
+                print(end='\b\b\b', flush=True)
+                n_dots = 0
+            else:
+                print(end='.', flush=True)
+                n_dots += 1
+            sleep(delay)
+
+    @staticmethod
+    def clear():
+        """clear.
+        """
+        os.system('clear')

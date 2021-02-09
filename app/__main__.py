@@ -17,14 +17,15 @@ Todo:
 http://google.github.io/styleguide/pyguide.html
 """
 
+# pylint: disable=import-error
 # Futures
 
 # Generic/Built-in
-import os
 
 # Other Libs
 
 # Owned
+from controllers.controller import Controller
 from views.menu import CYSMenu
 
 __author__ = "Michael Carrasco"
@@ -40,8 +41,8 @@ __status__ = "Dev"
 def main():
     """main.
     """
-    menu = CYSMenu("chess yo self")
-    menu.start()
+    ctrlr = Controller(None, None, CYSMenu("chess yo self"), None)
+    ctrlr.start()
     return 0
 
 main()
