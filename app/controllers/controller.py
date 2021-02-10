@@ -122,7 +122,10 @@ class Controller():
                           item['first_name'],
                           item['birth_date'],
                           Gender(item['gender']),
-                          int(item['rank']))
+                          int(item['rank']),
+                          int(item['match_score']),
+                          int(item['current_score']),
+                          item['opponents'])
         tournament_rounds_objs = []
         for rnd in item['rounds']:
             if isinstance(rnd, str):
@@ -146,7 +149,10 @@ class Controller():
                                                  play['first_name'],
                                                  play['birth_date'],
                                                  play['gender'],
-                                                 play['rank']))
+                                                 play['rank'],
+                                                 play['match_score'],
+                                                 play['current_score'],
+                                                 play['opponents']))
         return Tournament(item['name'], item['place'], item['date'],
                           tournament_player_objs, item['time_control'],
                           item['description'], tournament_rounds_objs,
@@ -549,7 +555,8 @@ class Controller():
                                             answers['date'],
                                             players,
                                             answers['time_control'],
-                                            answers['description'])
+                                            answers['description'],
+                                            round_count=answers['round_count'])
                         db_tournaments = c.get_all_tournaments()
                         view.printd("\nSauvegarde du nouveau tournoi")
                     else:
@@ -559,7 +566,7 @@ class Controller():
                     view.printd("\n Vous n'avez pas ajoute de joueur au "
                                 "tournoi, annulation")
                 else:
-                    db_players = []
+                    db_players = c.get_all_players()
             elif main_sel == 1 and isinstance(c, Controller):
                 db_players = c.get_all_players()
                 view.print_title_string(SubMTitles.ADD_PLAYER)
@@ -578,8 +585,8 @@ class Controller():
                                     answers['birth_date'],
                                     answers['gender'],
                                     answers['rank'])
-                    db_players = []
                     view.printd("\nSauvegarde du nouveau joueur")
+                db_players = c.get_all_players()
             elif main_sel == 2 and db_players:
                 view.print_title_string(SubMTitles.UPDATE_RANK)
                 for v in db_players:
@@ -614,9 +621,13 @@ class Controller():
                     winners = []
                     tied = []
                     tournament = c.get_item(choice['tournament'], 'tournament')
-                    # print(tournament['rounds'])
                     for i in range(1, tournament['round_count'] + 1):
                         tournament = c.get_item(choice['tournament'], 'tournament')
+                        # TODO printed
+                        # print("This is the tournament players before each loop in controller")
+                        # for ps in tournament['players']:
+                            # print(ps)
+                        # TODO printed
                         r = tournament['rounds'][i - 1]
                         for m in r['matches']:
                             if (m['pone_name'] != "Pas d'adversaire" and
@@ -831,9 +842,6 @@ class Controller():
             tournament.rounds[i - 1].end_date_time = now
         if i < tournament.round_count:
             tournament.rounds[i].start_date_time = now
-        for p in tournament.players:
-            print("name {}".format(p.first_name + " " + p.last_name))
-            print("current_score: {}".format(p.current_score))
         if winners is not None and tied is not None:
             tournament.proceed(winners, tied, i - 1)
         self.update_tournament_obj(tournament)

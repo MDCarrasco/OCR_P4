@@ -146,7 +146,9 @@ def insert_one(mydb, item, table_name):
         table.insert(
             {'first_name': item.first_name, 'last_name': item.last_name,
              'birth_date': item.birth_date, 'gender': item.gender,
-             'rank': item.rank})
+             'rank': item.rank, 'match_score': item.match_score,
+             'current_score': item.current_score, 'opponents': item.opponents}
+        )
     else:
         if table.search(where('name') == item.name):
             raise mvc_exc.ItemAlreadyStored(
@@ -192,7 +194,10 @@ def insert_many(mydb, items, table_name):
             table.insert(
                 {'first_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
-                 'rank': item.rank})
+                 'rank': item.rank, 'match_score': item.match_score,
+                 'current_score': item.current_score,
+                 'opponents': item.opponents}
+            )
         else:
             if table.search(where('name') == item.name):
                 raise mvc_exc.ItemAlreadyStored(
@@ -296,7 +301,9 @@ def update_one(mydb, item, table_name):
         if not table.update(
                 {'first_name': item.first_name, 'last_name': item.last_name,
                  'birth_date': item.birth_date, 'gender': item.gender,
-                 'rank': item.rank},
+                 'rank': item.rank, 'match_score': item.match_score,
+                 'current_score': item.current_score,
+                 'opponents': item.opponents},
                 ((where('first_name') == item.first_name) &
                  (where('last_name') == item.last_name))):
             raise mvc_exc.ItemNotStored(

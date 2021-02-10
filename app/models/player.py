@@ -43,8 +43,9 @@ class Player:
     # pylint: disable=too-many-arguments
     # pylint: disable=too-many-instance-attributes
     # pylint: disable=too-few-public-methods
+    # pylint: disable=dangerous-default-value
     def __init__(self, last_name, first_name, birth_date, gender, rank,
-                 match_score=0, current_score=0):
+                 match_score=0, current_score=0, opponents=[]):
         """Summary of __init__.
 
         Args:
@@ -61,6 +62,7 @@ class Player:
         self.rank = rank
         self.match_score = match_score
         self.current_score = current_score
+        self.opponents = opponents
 
     def __str__(self) -> str:
         return ('Joueur: {} {}\nNaissance: {}\nGenre: {}\nClassement: {}\n'
@@ -95,6 +97,9 @@ def player_to_dict(obj) -> dict:
             'last_name': obj.last_name,
             'birth_date': obj.birth_date,
             'gender': obj.gender,
-            'rank': obj.rank
+            'rank': obj.rank,
+            'match_score': obj.match_score,
+            'current_score': obj.current_score,
+            'opponents': obj.opponents
         }
     raise TypeError
