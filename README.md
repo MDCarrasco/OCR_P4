@@ -1,7 +1,7 @@
 # OCR_P4
 
-OpenClassrooms' Python Project 4 (Chess Yo Self) is a interactive CLI chess tournament manager.
 <img width="490" alt="image" src="https://user-images.githubusercontent.com/50454011/107670243-d3d66400-6c92-11eb-9bc0-10294308cb0b.png">
+OpenClassrooms' Python Project 4 (Chess Yo Self) is a interactive CLI chess tournament manager.
 
 ## Installation
 
