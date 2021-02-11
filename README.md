@@ -92,11 +92,11 @@ You can check whether all is good via the "Afficher" (Display) menu.
 - ### Start a tournament
 
 <img width="490" alt="image" src="https://user-images.githubusercontent.com/50454011/107683173-8a414580-6ca1-11eb-9bd2-c8900ec91d8d.gif">
-FINALLY ! You have at least 3 players registered and a tournament scheduled. Time to play the game.  
-All you have to do is tell "Chess yo self" who won or if this is a tie.
-(THIS DOES NOT WORK CURRENTLY).  
-Matchmaking follows the swiss-system.  
-If there are an uneven number of players, then players may get one point from playing against no one during a round.  
+FINALLY ! You have at least 3 players registered and a tournament scheduled. Time to play the game.<br />
+All you have to do is tell "Chess yo self" who won or if this is a tie.<br />
+(THIS DOES NOT WORK CURRENTLY).<br />
+Matchmaking follows the swiss-system.<br />
+If there are an uneven number of players, then players may get one point from playing against no one during a round.<br />
 You get to see the winner's cup at the end.
 
 - ### Display match history
