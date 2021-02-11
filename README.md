@@ -38,13 +38,10 @@ Logs can be found in the "logs" folder, flake8-html report is located inside the
 ## How it works
 
 ### "Why is it locked ?/Why is my form stuck when I try to submit an input ?"
-When you load an empty database file or create a new one, there are some options not yet available to you.
-
-For example you will not be able to create a tournament event if you have no players stored in the selected DB (in fact you need at least 3).
-
-You will not be able to change a player's rank if you don't have any player stored.
-
-You will get an error message (bottom line of your term window) when trying to submit a tournament date prior to today's date etc etc...
+When you load an empty database file or create a new one, there are some options not yet available to you.  
+For example you will not be able to create a tournament event if you have no players stored in the selected DB (in fact you need at least 3).  
+You will not be able to change a player's rank if you don't have any player stored.  
+You will get an error message (bottom line of your term window) when trying to submit a tournament date prior to today's date etc etc...  
 
 Got it ?
 
