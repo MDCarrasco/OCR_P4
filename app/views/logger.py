@@ -21,6 +21,7 @@ http://google.github.io/styleguide/pyguide.html
 # Futures
 
 # Generic/Built-in
+import json
 from time import strftime
 
 # Other Libs
@@ -212,11 +213,17 @@ class Logger():
         text = ('Change {} round count: {} --> {}'
                 .format(item, o_round_count, n_round_count))
         self.file.write("{}\n".format(text))
+        json_n_rounds = []
+        for rnd in n_rounds:
+            json_n_rounds.append('{}'.format(json.loads(rnd.to_json())))
         text = ('Change {} rounds: {} --> {}'
-                .format(item, o_rounds, n_rounds))
+                .format(item, o_rounds, json_n_rounds))
         self.file.write("{}\n".format(text))
+        json_n_players = []
+        for play in n_players:
+            json_n_players.append('{}'.format(json.loads(play.to_json())))
         text = ('Change {} players: {} --> {}'
-                .format(item, o_players, n_players))
+                .format(item, o_players, json_n_players))
         self.file.write("{}\n".format(text))
         text = ('Change {} time control: {} --> {}'
                 .format(item, o_time_control, n_time_control))
