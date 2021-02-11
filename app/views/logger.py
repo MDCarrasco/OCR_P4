@@ -138,7 +138,7 @@ class Logger():
         text = '**************************************************************'
         self.file.write("{}\n".format(text))
         text = ('We don\'t have any {} in our {} list. Please insert it first!'
-              .format(str(item).upper(), item_type))
+                .format(str(item).upper(), item_type))
         self.file.write("{}\n".format(text))
         text = '{}'.format(err.args[0])
         self.file.write("{}\n".format(text))
@@ -155,7 +155,7 @@ class Logger():
         text = '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
         self.file.write("{}\n".format(text))
         text = ('Hooray! We have just added some {} to our {} list!'
-              .format(str(item).upper(), item_type))
+                .format(str(item).upper(), item_type))
         self.file.write("{}\n".format(text))
         text = '++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++'
         self.file.write("{}\n".format(text))
@@ -213,16 +213,16 @@ class Logger():
                 .format(item, o_round_count, n_round_count))
         self.file.write("{}\n".format(text))
         text = ('Change {} rounds: {} --> {}'
-              .format(item, o_rounds, n_rounds))
+                .format(item, o_rounds, n_rounds))
         self.file.write("{}\n".format(text))
         text = ('Change {} players: {} --> {}'
-              .format(item, o_players, n_players))
+                .format(item, o_players, n_players))
         self.file.write("{}\n".format(text))
         text = ('Change {} time control: {} --> {}'
-              .format(item, o_time_control, n_time_control))
+                .format(item, o_time_control, n_time_control))
         self.file.write("{}\n".format(text))
         text = ('Change {} description: {} --> {}'
-              .format(item, o_description, n_description))
+                .format(item, o_description, n_description))
         self.file.write("{}\n".format(text))
         text = '---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --'
         self.file.write("{}\n".format(text))
@@ -245,13 +245,13 @@ class Logger():
         text = '---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --'
         self.file.write("{}\n".format(text))
         text = ('Change {} birth date: {} --> {}'
-              .format(item, o_birth_date, n_birth_date))
+                .format(item, o_birth_date, n_birth_date))
         self.file.write("{}\n".format(text))
         text = ('Change {} gender: {} --> {}'
-              .format(item, o_gender, n_gender))
+                .format(item, o_gender, n_gender))
         self.file.write("{}\n".format(text))
         text = ('Change {} ranking: {} --> {}'
-              .format(item, o_ranking, n_ranking))
+                .format(item, o_ranking, n_ranking))
         self.file.write("{}\n".format(text))
         text = '---   ---   ---   ---   ---   ---   ---   ---   ---   ---   --'
         self.file.write("{}\n".format(text))

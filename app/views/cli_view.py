@@ -39,6 +39,7 @@ __maintainer__ = "Michael Carrasco"
 __email__ = "<michaeldanielcarrasco@gmail.com>"
 __status__ = "Dev"
 
+
 class CliView():
     """CliView.
     """
@@ -64,7 +65,6 @@ class CliView():
         """
         return "{}\n  {}\n".format(self.app_title_f
                                    .renderText(self.app_title), string)
-
 
     @staticmethod
     def printd(text, duration=4, delay=.5):

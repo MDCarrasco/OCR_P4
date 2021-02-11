@@ -62,7 +62,7 @@ def connect_to_db(name) -> TinyDB:
     mydb = TinyDB('./databases/{}.json'.format(name))
     TinyDB.DEFAULT_TABLE = 'my-default'
     TinyDB.DEFAULT_TABLE_KWARGS = {'cache_size': 0}
-    print('New connection to tinyDB ({})...'.format(name))
+    # print('New connection to tinyDB ({})...'.format(name))
     return mydb
 
 
@@ -94,7 +94,7 @@ def disconnect_from_db(mydb=None):
     """
     if mydb is not None:
         mydb.close()
-        print('Disconnecting from tinyDB...')
+        # print('Disconnecting from tinyDB...')
 
 
 def scrub(input_string) -> str:
@@ -243,6 +243,7 @@ def select_one(mydb, item_name, table_name):
         'Can\'t read "{}" because it\'s not stored in table "{}"'
         .format(item_name, table_name))
 
+
 @connect
 def select_one_by_rank(mydb, item_rank, table_name):
     """Summary of select_one by rank.
@@ -263,7 +264,6 @@ def select_one_by_rank(mydb, item_rank, table_name):
     raise mvc_exc.ItemNotStored(
         'Can\'t read "{}" because it\'s not stored in table "{}"'
         .format(item_rank, table_name))
-
 
 
 @connect

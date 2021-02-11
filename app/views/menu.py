@@ -45,6 +45,7 @@ __maintainer__ = "Michael Carrasco"
 __email__ = "<michaeldanielcarrasco@gmail.com>"
 __status__ = "Dev"
 
+
 # pylint: disable=too-many-instance-attributes
 class CYSMenu(CliView):
     """Menu.

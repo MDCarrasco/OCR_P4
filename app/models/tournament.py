@@ -118,11 +118,11 @@ class Tournament:
                                      ' ' +
                                      second_half[i].last_name), None)
             first_half_play.opponents.append(second_half_play.first_name +
-                                              ' ' +
-                                              second_half_play.last_name)
+                                             ' ' +
+                                             second_half_play.last_name)
             second_half_play.opponents.append(first_half_play.first_name +
-                                               ' ' +
-                                               first_half_play.last_name)
+                                              ' ' +
+                                              first_half_play.last_name)
         if length > middle_index*2:
             matches.append(Match("Pas d'adversaire", 0,
                                  second_half[middle_index].first_name +
@@ -171,8 +171,7 @@ class Tournament:
         if tied:
             for tie in tied:
                 play = next((x for x in points_or_rank_p if x.first_name +
-                            ' ' +
-                            x.last_name == tie), None)
+                            ' ' + x.last_name == tie), None)
                 if play:
                     play.match_score = 0.5
                     for m in self.rounds[idx].matches:
@@ -185,34 +184,31 @@ class Tournament:
             i = 0
             while i < len(points_or_rank_p):
                 offset = 2
-                if len(points_or_rank_p[i].opponents) == len(points_or_rank_p):
-                    points_or_rank_p[i].opponents = []
+                porpi = points_or_rank_p[i]
+                if len(porpi.opponents) == len(points_or_rank_p):
+                    porpi.opponents = []
                 try:
                     while offset < (len(points_or_rank_p)):
-                        n = points_or_rank_p[i + 1].first_name+ ' ' +points_or_rank_p[i + 1].last_name
-                        if n in points_or_rank_p[i].opponents:
-                            points_or_rank_p[i + 1], points_or_rank_p[i + offset] = points_or_rank_p[i + offset], points_or_rank_p[i + 1]
+                        next_porpi = points_or_rank_p[i + 1]
+                        offset_next_porpi = points_or_rank_p[i + offset]
+                        n = next_porpi.first_name + ' ' + next_porpi.last_name
+                        if n in porpi.opponents:
+                            next_porpi, offset_next_porpi = offset_next_porpi, next_porpi
                         offset += 1
-                    matches.append(Match(points_or_rank_p[i].first_name + ' ' +
-                                    points_or_rank_p[i].last_name, 0,
-                                    points_or_rank_p[i + 1].first_name + ' ' +
-                                    points_or_rank_p[i + 1].last_name, 0))
+                    matches.append(Match(porpi.first_name + ' ' +
+                                         porpi.last_name, 0,
+                                         next_porpi.first_name + ' ' +
+                                         next_porpi.last_name, 0))
                     first_in_pair_play = next(
                         (x for x in self.players if x.first_name +
-                         ' ' +
-                         x.last_name == points_or_rank_p[i].first_name +
-                         ' ' +
-                         points_or_rank_p[i].last_name),
-                        None
+                         ' ' + x.last_name == porpi.first_name +
+                         ' ' + porpi.last_name), None
                     )
 
                     second_in_pair_play = next(
                         (x for x in self.players if x.first_name +
-                         ' ' +
-                         x.last_name == points_or_rank_p[i + 1].first_name +
-                         ' ' +
-                         points_or_rank_p[i + 1].last_name),
-                        None
+                         ' ' + x.last_name == next_porpi.first_name +
+                         ' ' + next_porpi.last_name), None
                     )
                     first_in_pair_play.opponents.append(
                         second_in_pair_play.first_name +
@@ -226,13 +222,12 @@ class Tournament:
                 # pylint: disable=bare-except
                 except IndexError:
                     matches.append(Match("Pas d'adversaire", 0,
-                                         points_or_rank_p[i].first_name + ' ' +
-                                         points_or_rank_p[i].last_name, 0))
+                                         porpi.first_name + ' ' +
+                                         porpi.last_name, 0))
                     second_in_pair_play = next((x for x in self.players if x.first_name +
                                                 ' ' +
-                                                x.last_name == points_or_rank_p[i].first_name +
-                                                ' ' +
-                                                points_or_rank_p[i].last_name), None)
+                                                x.last_name == porpi.first_name +
+                                                ' ' + porpi.last_name), None)
                     second_in_pair_play.opponents.append("Pas d'adversaire")
                     i += 2
             self.rounds[idx + 1].matches = matches

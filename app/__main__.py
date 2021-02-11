@@ -41,8 +41,10 @@ __status__ = "Dev"
 def main():
     """main.
     """
+
     ctrlr = Controller(None, None, CYSMenu("chess yo self"), None)
     ctrlr.start()
     return 0
+
 
 main()

@@ -53,6 +53,7 @@ __maintainer__ = "Michael Carrasco"
 __email__ = "<michaeldanielcarrasco@gmail.com>"
 __status__ = "Dev"
 
+
 def list_db_files(directory="./databases/") -> list:
     """Summary of list_db_files.
 
@@ -63,7 +64,8 @@ def list_db_files(directory="./databases/") -> list:
         list: Description of return value
     """
     return list((file for file in os.listdir(directory)
-            if os.path.isfile(os.path.join(directory, file))))
+                 if os.path.isfile(os.path.join(directory, file))))
+
 
 def database_is_not_empty(filename) -> bool:
     """Summary of database_is_not_empty.
@@ -215,7 +217,6 @@ class Controller():
             )
         return objs
 
-
     def log_all_tournaments(self, bullet_points=False):
         """Summary of log_all_tournaments.
 
@@ -257,10 +258,10 @@ class Controller():
         objs = []
         for item in items:
             objs.append(Player(item['last_name'],
-                          item['first_name'],
-                          item['birth_date'],
-                          item['gender'],
-                          item['rank']))
+                               item['first_name'],
+                               item['birth_date'],
+                               item['gender'],
+                               item['rank']))
         return objs
 
     def log_all_players(self, bullet_points=False):
@@ -347,11 +348,11 @@ class Controller():
         try:
             self.players.create_item(player)
             self.logger.log_item_stored(first_name + ' ' +
-                                          last_name, item_type)
+                                        last_name, item_type)
         except mvc_exc.ItemAlreadyStored as exc:
             self.logger.log_item_already_stored_error(first_name + ' ' +
-                                                        last_name, item_type,
-                                                        exc)
+                                                      last_name, item_type,
+                                                      exc)
 
     def insert_player_obj(self, obj):
         """Summary of insert_player_obj.
@@ -391,9 +392,9 @@ class Controller():
         assert rounds, 'rounds must not be empty'
         assert players, 'players must not be empty'
         assert TimeControl.has_value(time_control), ('time_control must have'
-                                                       ' value: '
-                                                       '\'Bullet\','
-                                                       '\'Blitz\' or \'Rapid\'')
+                                                     ' value: '
+                                                     '\'Bullet\','
+                                                     '\'Blitz\' or \'Rapid\'')
         assert isinstance(description, str), 'description must be a string'
         item_type = self.tournaments.item_type
         tournament = Tournament(name, place, date, players, time_control,
@@ -447,8 +448,8 @@ class Controller():
                 older['gender'], older['rank'], birth_date, gender, rank)
         except mvc_exc.ItemNotStored as exc:
             self.logger.log_item_not_yet_stored_error(first_name + ' ' +
-                                                           last_name, item_type,
-                                                           exc)
+                                                      last_name, item_type,
+                                                      exc)
 
     def update_player_obj(self, obj):
         """Summary of update_player_obj.
@@ -515,7 +516,8 @@ class Controller():
         """start.
         """
         # pylint: disable=invalid-name
-        c = lambda: None
+        # c = lambda: None
+        c = None
         view = self.menu_view
         db_files = self.db_files
         db_players = []
@@ -573,9 +575,11 @@ class Controller():
                     lambda rank: "Entrez un nombre positif."
                     if not rank.isdigit() or int(rank) <= 0
                     else ("Il existe deja un joueur avec ce classement "
-                    "dans la bdd."
-                    if next((d for d in db_players if d["rank"] == int(rank)),
-                            None) else True)
+                          "dans la bdd."
+                          if next(
+                              (d for d in db_players if d["rank"] == int(rank)),
+                              None
+                          ) else True)
                 )
                 answers = view.prompt_form(view.player_form)
                 if answers and answers['done']:
@@ -627,9 +631,9 @@ class Controller():
                         for m in r['matches']:
                             if (m['pone_name'] != "Pas d'adversaire" and
                                     m['ptwo_name'] != "Pas d'adversaire"):
-                                view.who_won[0]['choices'] =[m['pone_name'],
-                                                             m['ptwo_name'],
-                                                             'Aucun']
+                                view.who_won[0]['choices'] = [m['pone_name'],
+                                                              m['ptwo_name'],
+                                                              'Aucun']
                                 view.print_title_string(SubMTitles.TOURNAMENT_FOLLOW_UP
                                                         .format("Round {} | Match {}"
                                                                 .format(i, m_counter)))
@@ -692,7 +696,7 @@ class Controller():
                         answer = view.prompt_form(view.tournament_pick)
                         if 'tournament' in answer and answer['tournament']:
                             tournament = c.get_obj(answer['tournament'],
-                                                    'tournament')
+                                                   'tournament')
                             while not view.display_sorted_menu_back:
                                 display_sorted_sel = (
                                     view.display_sorted_menu.show()
@@ -722,7 +726,7 @@ class Controller():
                         answer = view.prompt_form(view.tournament_pick)
                         if 'tournament' in answer and answer['tournament']:
                             tournament = c.get_obj(answer['tournament'],
-                                                    'tournament')
+                                                   'tournament')
                             view.print_pydoc(tournament.rounds)
                     elif display_sel == 4 and db_tournaments:
                         view.print_title_string(SubMTitles
@@ -734,9 +738,9 @@ class Controller():
                         answer = view.prompt_form(view.tournament_pick)
                         if 'tournament' in answer and answer['tournament']:
                             tournament = c.get_obj(answer['tournament'],
-                                                    'tournament')
+                                                   'tournament')
                         view.clear()
-                        tournament_matches =[]
+                        tournament_matches = []
                         for i, rnd in zip(range(1, len(tournament.rounds) + 1),
                                           tournament.rounds):
                             tournament_matches.append('-----Round {}-----'.format(i))
@@ -783,9 +787,9 @@ class Controller():
                     if view.load_db_sel != -1 and view.load_db_sel is not None:
                         choice = db_files[view.load_db_sel]
                         # if database_is_not_empty(choice):
-                            # coloredchoice = Bcolors.apply_green(choice)
+                        # coloredchoice = Bcolors.apply_green(choice)
                         # else:
-                            # coloredchoice = Bcolors.apply_warning(choice)
+                        # coloredchoice = Bcolors.apply_warning(choice)
                         view.main_menu_title = view.title_string(
                             "Assistant pour tournois d'echecs ({})"
                             .format(choice))
@@ -859,7 +863,7 @@ class Controller():
         scoreboard.append(self.menu_view.title_string("~~~Fin du tournoi~~~"))
         for player in sorted_players:
             scoreboard.append("{}: {} ".format(player.first_name + ' ' + player.last_name,
-                               player.current_score))
+                                               player.current_score))
         for line in self.menu_view.end_of_tournament:
             scoreboard.append(Bcolors.apply_warning(line))
         winner = sorted_players[0]
@@ -867,7 +871,6 @@ class Controller():
                                                 .format(winner.first_name + ' ' +
                                                         winner.last_name, winner.current_score)))
         return scoreboard
-
 
     def disconnect(self):
         """disconnect.
