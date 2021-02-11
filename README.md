@@ -9,7 +9,7 @@ Therefore it only works on UNIX.
 
 ## Installation
 
-```bash
+```shell-session
 python -m venv env
 source ./env/bin/activate
 pip install -r ./requirements.txt
@@ -19,25 +19,26 @@ pip install -r ./requirements.txt
 
 ### Launch
 
-```bash
+```shell-session
 ./run
 ```
 
 ### Logs
-```bash
+```shell-session
 ./clearlogs
 ./seelogs
 ```
 
 ### Flake8 Report
-```bash
+```shell-session
 ./runflake8
 ```
 Logs can be found in the "logs" folder, flake8-html report is located inside the "flake8-rapport" folder and it has option max-line-length set to 119.
 
 ## How it works
 
-### "Why is it locked ?/Why is my form stuck when I try to submit an input ?"
+- ### "Why is it locked ?/Why is my form stuck when I try to submit an input ?"
+
 When you load an empty database file or create a new one, there are some options not yet available to you.  
 For example you will not be able to create a tournament event if you have no players stored in the selected DB (in fact you need at least 3).  
 You will not be able to change a player's rank if you don't have any player stored.  
@@ -45,7 +46,7 @@ You will get an error message (bottom line of your term window) when trying to s
 
 Got it ?
 
-### Loading a database file/Creating a new database
+- ### Loading a database file/Creating a new database
 
 <img width="490" alt="image" src="https://user-images.githubusercontent.com/50454011/107674742-92948300-6c97-11eb-8262-b9d289be4865.gif">
 When you first run the program you will be asked to load a database, this is mandatory and cannot be skipped ofc.
