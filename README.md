@@ -7,6 +7,22 @@ Front is a mix of simple-term-menu and pydoc packages.
 
 Therefore it only works on UNIX.
 
+- [Installation](#installation)
+- [Usage](#usage)
+  * [Launch](#launch)
+  * [Logs](#logs)
+  * [Flake8 Report](#flake8-report)
+- [How it works](#how-it-works)
+  * ["Why is it locked ?/Why is my form stuck when I try to submit an input ?"](#-why-is-it-locked---why-is-my-form-stuck-when-i-try-to-submit-an-input---)
+  * [Load a database file/Create a new database](#load-a-database-file-create-a-new-database)
+  * [Add a new player](#add-a-new-player)
+  * [Change a player's rank](#change-a-player-s-rank)
+  * [Schedule a tournament](#schedule-a-tournament)
+  * [Start a tournament](#start-a-tournament)
+  * [Display match history](#display-match-history)
+  * [Display logs](#display-logs)
+- [Notes](#notes)
+
 ## Installation
 
 ```bash
