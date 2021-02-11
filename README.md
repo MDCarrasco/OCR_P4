@@ -1,6 +1,34 @@
 # OCR_P4
-Chess Yo Self...
 
-<img width="461" alt="image" src="https://user-images.githubusercontent.com/50454011/105533875-ff49dc80-5cec-11eb-9ad9-959c9523ac1a.png">
+<img width="490" alt="image" src="https://user-images.githubusercontent.com/50454011/107670243-d3d66400-6c92-11eb-9bc0-10294308cb0b.png">
+OpenClassrooms' Python Project 4 (Chess Yo Self) is a interactive CLI chess tournament manager.
 
-EN COURS...
+## Installation
+
+```bash
+python -m venv env
+source ./env/bin/activate
+pip install -r ./requirements.txt
+```
+
+## Usage
+
+### Launch
+
+```bash
+./run
+```
+
+### Logs
+```bash
+./clearlogs
+./seelogs
+```
+
+### Flake8 Report
+```bash
+./runflake8
+```
+Logs can be found in the "logs" folder, flake8-html report is located inside the "flake8-rapport" folder and it has option max-line-length set to 119.
+
+## How it works
