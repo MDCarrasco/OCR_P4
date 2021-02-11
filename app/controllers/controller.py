@@ -538,6 +538,7 @@ class Controller():
                         (d for d in db_tournaments if d["name"] == name),
                         None) else ("Entrez un nom." if not name else True)
                 )
+                view.tournament_form[3]['choices'] = []
                 for v in db_players:
                     view.tournament_form[3]['choices'].append(
                         {'name': "{} {}".format(
@@ -566,8 +567,7 @@ class Controller():
                     db_players = []
                     view.printd("\n Vous n'avez pas ajoute de joueur au "
                                 "tournoi, annulation")
-                else:
-                    db_players = c.get_all_players()
+                db_players = c.get_all_players()
             elif main_sel == 1 and isinstance(c, Controller):
                 db_players = c.get_all_players()
                 view.print_title_string(SubMTitles.ADD_PLAYER)
@@ -589,6 +589,7 @@ class Controller():
                                     answers['gender'],
                                     answers['rank'])
                     view.printd("\nSauvegarde du nouveau joueur")
+                db_players = []
                 db_players = c.get_all_players()
             elif main_sel == 2 and db_players:
                 view.print_title_string(SubMTitles.UPDATE_RANK)
