@@ -42,5 +42,8 @@ You will not be able to change a player's rank if you don't have any player stor
 You will get an error message (bottom line of your term window) when trying to submit a tournament date prior to today's date etc etc...
 Got it ?
 
-### Loading a database file
+### Loading a database file/Creating a new database
+
+![2021-02-11 18 31 48](https://user-images.githubusercontent.com/50454011/107674742-92948300-6c97-11eb-8262-b9d289be4865.gif)
 When you first run the program you will be asked to load a database, this is mandatory and cannot be skipped ofc.
+You may then create a new database file if you so desire.
