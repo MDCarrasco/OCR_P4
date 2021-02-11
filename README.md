@@ -29,6 +29,6 @@ pip install -r ./requirements.txt
 ```bash
 ./runflake8
 ```
-Logs can be found in the "logs" folder, flake8 report is in the "flake8-rapport" folder.
+Logs can be found in the "logs" folder, flake8-html report is located inside the "flake8-rapport" folder and it has option max-line-length set to 119.
 
 ## How it works
