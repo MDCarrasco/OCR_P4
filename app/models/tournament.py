@@ -153,30 +153,40 @@ class Tournament:
             idx
         """
         matches = []
+        for p in self.players:
+            p.match_score = 0
+        points_or_rank_p = sorted(self.players,
+                                  key=lambda x: (-x.current_score, x.rank))
         for winner in winners:
-            play = next((x for x in self.players if x.first_name +
-                         ' ' +
-                         x.last_name == winner), None)
+            play = next((x for x in points_or_rank_p if x.first_name +
+                        ' ' + x.last_name == winner), None)
             if play:
                 play.match_score = 1
+                for m in self.rounds[idx].matches:
+                    if m.tuple[0][0] == play.first_name + ' ' + play.last_name:
+                        m.tuple[0][1] = play.match_score
+                    elif m.tuple[1][0] == play.first_name + ' ' + play.last_name:
+                        m.tuple[1][1] = play.match_score
                 play.current_score += play.match_score
         if tied:
             for tie in tied:
-                play = next((x for x in self.players if x.first_name +
-                             ' ' +
-                             x.last_name == tie), None)
+                play = next((x for x in points_or_rank_p if x.first_name +
+                            ' ' +
+                            x.last_name == tie), None)
                 if play:
                     play.match_score = 0.5
+                    for m in self.rounds[idx].matches:
+                        if m.tuple[0][0] == play.first_name + ' ' + play.last_name:
+                            m.tuple[0][1] = play.match_score
+                        elif m.tuple[1][0] == play.first_name + ' ' + play.last_name:
+                            m.tuple[1][1] = play.match_score
                     play.current_score += play.match_score
         if idx != self.round_count - 1:
-            points_or_rank_p = sorted(self.players,
-                                      key=lambda x: (-x.current_score, x.rank))
             i = 0
             while i < len(points_or_rank_p):
                 offset = 2
-                for player in points_or_rank_p:
-                    if len(player.opponents) == len(points_or_rank_p):
-                        player.opponents = []
+                if len(points_or_rank_p[i].opponents) == len(points_or_rank_p):
+                    points_or_rank_p[i].opponents = []
                 try:
                     while offset < (len(points_or_rank_p)):
                         n = points_or_rank_p[i + 1].first_name+ ' ' +points_or_rank_p[i + 1].last_name
@@ -184,11 +194,9 @@ class Tournament:
                             points_or_rank_p[i + 1], points_or_rank_p[i + offset] = points_or_rank_p[i + offset], points_or_rank_p[i + 1]
                         offset += 1
                     matches.append(Match(points_or_rank_p[i].first_name + ' ' +
-                                    points_or_rank_p[i].last_name,
-                                    points_or_rank_p[i].match_score,
+                                    points_or_rank_p[i].last_name, 0,
                                     points_or_rank_p[i + 1].first_name + ' ' +
-                                    points_or_rank_p[i + 1].last_name,
-                                    points_or_rank_p[i + 1].match_score))
+                                    points_or_rank_p[i + 1].last_name, 0))
                     first_in_pair_play = next(
                         (x for x in self.players if x.first_name +
                          ' ' +
@@ -218,13 +226,13 @@ class Tournament:
                 # pylint: disable=bare-except
                 except IndexError:
                     matches.append(Match("Pas d'adversaire", 0,
-                                    points_or_rank_p[i].first_name + ' ' +
-                                    points_or_rank_p[i].last_name, 1))
+                                         points_or_rank_p[i].first_name + ' ' +
+                                         points_or_rank_p[i].last_name, 0))
                     second_in_pair_play = next((x for x in self.players if x.first_name +
-                                     ' ' +
-                                     x.last_name == points_or_rank_p[i].first_name +
-                                     ' ' +
-                                     points_or_rank_p[i].last_name), None)
+                                                ' ' +
+                                                x.last_name == points_or_rank_p[i].first_name +
+                                                ' ' +
+                                                points_or_rank_p[i].last_name), None)
                     second_in_pair_play.opponents.append("Pas d'adversaire")
                     i += 2
             self.rounds[idx + 1].matches = matches

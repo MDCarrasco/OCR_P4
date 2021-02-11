@@ -258,6 +258,22 @@ class CYSMenu(CliView):
             Token.Question: '',
         })
 
+        self.end_of_tournament = []
+        self.end_of_tournament.append("\n\n        .-..-\"\"``\"\"-..-.")
+        self.end_of_tournament.append("        |(`\\`'----'`/`)|")
+        self.end_of_tournament.append("         \\\\ ;:.    ; //")
+        self.end_of_tournament.append("          \\\\|%.    |//")
+        self.end_of_tournament.append("           )|%:    |(")
+        self.end_of_tournament.append("         ((,|%.    |,))")
+        self.end_of_tournament.append("          '-\\::.   /-'")
+        self.end_of_tournament.append("             '::..'")
+        self.end_of_tournament.append("               }{")
+        self.end_of_tournament.append("              {__}")
+        self.end_of_tournament.append("             /    \\")
+        self.end_of_tournament.append("            |`----'|")
+        self.end_of_tournament.append("            | [#1] |")
+        self.end_of_tournament.append("            '.____.'\n")
+
     def print_title_string(self, that):
         """Summary of print_title_string.
 

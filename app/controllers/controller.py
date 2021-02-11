@@ -24,10 +24,8 @@ http://google.github.io/styleguide/pyguide.html
 # Generic/Built-in
 import json
 import os
-import itertools
 from typing import Union
 from datetime import datetime
-from time import sleep
 
 # Other Libs
 from simple_term_menu import TerminalMenu
@@ -40,6 +38,7 @@ from models.player import Player
 from models.enums import TimeControl
 from models.enums import Gender
 from models.carriers import TournamentCarrier, PlayerCarrier
+from models.bcolors import Bcolors
 from views.sub_m_titles import SubMTitles
 from views.logger import Logger
 from views.validators import is_date
@@ -623,18 +622,17 @@ class Controller():
                     tournament = c.get_item(choice['tournament'], 'tournament')
                     for i in range(1, tournament['round_count'] + 1):
                         tournament = c.get_item(choice['tournament'], 'tournament')
-                        # TODO printed
-                        # print("This is the tournament players before each loop in controller")
-                        # for ps in tournament['players']:
-                            # print(ps)
-                        # TODO printed
                         r = tournament['rounds'][i - 1]
+                        m_counter = 1
                         for m in r['matches']:
                             if (m['pone_name'] != "Pas d'adversaire" and
                                     m['ptwo_name'] != "Pas d'adversaire"):
                                 view.who_won[0]['choices'] =[m['pone_name'],
                                                              m['ptwo_name'],
                                                              'Aucun']
+                                view.print_title_string(SubMTitles.TOURNAMENT_FOLLOW_UP
+                                                        .format("Round {} | Match {}"
+                                                                .format(i, m_counter)))
                                 winner = view.prompt_form(view.who_won)
                                 if 'fullname' in winner and winner['fullname'] == 'Aucun':
                                     tied.append(m['pone_name'])
@@ -645,19 +643,16 @@ class Controller():
                                 winners.append(m['ptwo_name'])
                             else:
                                 winners.append(m['pone_name'])
+                            view.clear()
+                            m_counter += 1
                         c.next_round(choice['tournament'], winners=winners,
                                      tied=tied, i=i)
                         winners = []
                         tied = []
                         view.who_won[0]['choices'] = []
-                    c.end_tournament(choice['tournament'])
-                    view.print_title_string(SubMTitles
-                                            .TOURNAMENT_FOLLOW_UP
-                                            .format(choice['tournament']))
-                    # affichage des joueurs/paires du round actuet
-                    # et update en permanence en dessous du titre de l'app
-                    # formulaire de resultats liste des paires restantes
-                    # results = prompt(round_results_form, style=style)
+                        view.clear()
+                    scoreboard = c.end_tournament(choice['tournament'])
+                    view.print_pydoc(scoreboard)
             elif main_sel == 4 and isinstance(c, Controller):
                 while not view.display_menu_back:
                     display_sel = view.display_menu.show()
@@ -846,13 +841,32 @@ class Controller():
             tournament.proceed(winners, tied, i - 1)
         self.update_tournament_obj(tournament)
 
-    def end_tournament(self, tournament_name):
-        """end_tournament.
+    def end_tournament(self, tournament_name) -> list:
+        """Summary of end_tournament.
+
+        Args:
+            tournament_name
+
+        Returns:
+            list: scoreboard
         """
         now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         tournament = self.get_obj(tournament_name, 'tournament')
         tournament.rounds[tournament.round_count - 1].end_date_time = now
         self.update_tournament_obj(tournament)
+        scoreboard = []
+        sorted_players = sorted(tournament.players, key=lambda x: (-x.current_score, x.rank))
+        scoreboard.append(self.menu_view.title_string("~~~Fin du tournoi~~~"))
+        for player in sorted_players:
+            scoreboard.append("{}: {} ".format(player.first_name + ' ' + player.last_name,
+                               player.current_score))
+        for line in self.menu_view.end_of_tournament:
+            scoreboard.append(Bcolors.apply_warning(line))
+        winner = sorted_players[0]
+        scoreboard.append(Bcolors.apply_warning("Le gagnant est {} avec un score de {} points !!"
+                                                .format(winner.first_name + ' ' +
+                                                        winner.last_name, winner.current_score)))
+        return scoreboard
 
 
     def disconnect(self):
