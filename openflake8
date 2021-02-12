@@ -1,0 +1,3 @@
+#!/bin/bash
+
+open ./flake8-rapport/index.html
