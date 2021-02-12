@@ -1,0 +1,4 @@
+#!/bin/bash
+
+result=$(find . -maxdepth 1 -perm +111 -type f -exec tail -n +1 {} +) 
+echo "$result" | grep --color=always '^==>.*<==\|$' 
