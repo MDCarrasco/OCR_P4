@@ -858,7 +858,6 @@ class Controller():
         now = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         tournament = self.get_obj(tournament_name, 'tournament')
         tournament.rounds[tournament.round_count - 1].end_date_time = now
-        self.update_tournament_obj(tournament)
         scoreboard = []
         sorted_players = sorted(tournament.players, key=lambda x: (-x.current_score, x.rank))
         scoreboard.append(self.menu_view.title_string("~~~Fin du tournoi~~~"))
@@ -871,6 +870,9 @@ class Controller():
         scoreboard.append(Bcolors.apply_warning("Le gagnant est {} avec un score de {} points !!"
                                                 .format(winner.first_name + ' ' +
                                                         winner.last_name, winner.current_score)))
+        for player in tournament.players:
+            player.current_score = 0
+        self.update_tournament_obj(tournament)
         return scoreboard
 
     def disconnect(self):
